@@ -1,0 +1,2219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hệ thống trắc nghiệm tương tác giúp học sinh tự kiểm tra và củng cố kiến thức môn Toán lớp 8 chuẩn chương trình giáo dục mới.">
+    <title>Chuyên gia Khảo thí Toán 8 - Hệ thống Quiz tương tác</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* CSS variables for Design Tokens */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --accent-pink: #ec4899;
+            --success-color: #22c55e;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            
+            /* Dark Mode Defaults */
+            --bg-gradient: radial-gradient(circle at top right, #121026, #07070b);
+            --card-bg: rgba(15, 23, 42, 0.45);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --btn-bg: rgba(255, 255, 255, 0.06);
+            --btn-hover: rgba(255, 255, 255, 0.12);
+            --input-bg: rgba(0, 0, 0, 0.25);
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --scrollbar-bg: #0f172a;
+            --scrollbar-thumb: #334155;
+            
+            --font-family: 'Plus Jakarta Sans', sans-serif;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Light Mode Theme */
+        [data-theme="light"] {
+            --bg-gradient: radial-gradient(circle at top right, #e0e7ff, #f1f5f9);
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --card-border: rgba(0, 0, 0, 0.06);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --btn-bg: rgba(0, 0, 0, 0.04);
+            --btn-hover: rgba(0, 0, 0, 0.08);
+            --input-bg: rgba(255, 255, 255, 0.8);
+            --shadow-color: rgba(99, 102, 241, 0.08);
+            --scrollbar-bg: #f1f5f9;
+            --scrollbar-thumb: #cbd5e1;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            transition: var(--transition-smooth);
+            line-height: 1.6;
+        }
+
+        /* Ambient Glow Background Orbs */
+        .ambient-orbs {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: orbFloat 20s infinite ease-in-out alternate;
+        }
+
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--accent-cyan);
+            top: 15%;
+            left: 10%;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-purple);
+            bottom: 10%;
+            right: 10%;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 250px;
+            height: 250px;
+            background: var(--accent-pink);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 30px) scale(1.15); }
+        }
+
+        /* Header Style */
+        header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--card-border);
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 800;
+            font-size: 1.35rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo i {
+            font-size: 1.6rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle, .sound-toggle {
+            background: var(--btn-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 6px var(--shadow-color);
+        }
+
+        .theme-toggle:hover, .sound-toggle:hover {
+            transform: scale(1.08);
+            background: var(--btn-hover);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        /* Main Container Layout */
+        main {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            z-index: 5;
+            position: relative;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            min-height: 520px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px var(--shadow-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography & Headings */
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        h2 {
+            font-size: 1.45rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Form Controls & Topic Checklist */
+        .options-group {
+            background: var(--input-bg);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--card-border);
+        }
+
+        .group-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-cyan);
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topic-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 600px) {
+            .topic-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--btn-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .checkbox-label:hover {
+            background: var(--btn-hover);
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--text-muted);
+            border-radius: 6px;
+            outline: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition-smooth);
+        }
+
+        .checkbox-label input[type="checkbox"]:checked {
+            background: var(--accent-purple);
+            border-color: var(--accent-purple);
+        }
+
+        .checkbox-label input[type="checkbox"]:checked::after {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: white;
+            font-size: 0.75rem;
+        }
+
+        /* Mode Selection Cards */
+        .mode-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .mode-selection {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mode-card {
+            background: var(--btn-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mode-card:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .mode-card.active {
+            border-color: var(--accent-purple);
+            background: rgba(168, 85, 247, 0.08);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.15);
+        }
+
+        .mode-card .mode-icon {
+            font-size: 1.8rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.25rem;
+        }
+
+        .mode-card .mode-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .mode-card .mode-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .select-all-btn {
+            background: none;
+            border: none;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Buttons & Actions */
+        .btn {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 1rem 2rem;
+            font-family: var(--font-family);
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.35);
+            transition: var(--transition-smooth);
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(168, 85, 247, 0.5);
+            filter: brightness(1.08);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn.btn-outline {
+            background: var(--btn-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            box-shadow: none;
+        }
+
+        .btn.btn-outline:hover {
+            background: var(--btn-hover);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        /* Quiz Status & Navigation Header */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .quiz-info-pill {
+            background: var(--btn-bg);
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            border: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pill-accent {
+            color: var(--accent-cyan);
+        }
+
+        .pill-timer {
+            color: var(--warning-color);
+        }
+
+        .timer-warning {
+            animation: pulse-red 1s infinite alternate;
+            color: var(--error-color) !important;
+            font-weight: 800;
+        }
+
+        @keyframes pulse-red {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: var(--input-bg);
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--primary-gradient);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+        }
+
+        /* Question Box Styling */
+        .question-card {
+            margin-bottom: 1.75rem;
+        }
+
+        .question-tag {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+            display: inline-block;
+            background: rgba(6, 182, 212, 0.1);
+            padding: 0.2rem 0.75rem;
+            border-radius: 8px;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1.45;
+            color: var(--text-main);
+        }
+
+        /* Quiz Answer Options Grid */
+        .answers-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .answer-btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 1.1rem 1.5rem;
+            text-align: left;
+            font-family: var(--font-family);
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .answer-btn:hover:not([disabled]) {
+            background: var(--btn-hover);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateX(4px);
+        }
+
+        .answer-btn.selected {
+            background: rgba(168, 85, 247, 0.15);
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.2);
+            font-weight: 600;
+        }
+
+        .answer-btn.correct {
+            background: rgba(34, 197, 94, 0.15) !important;
+            border-color: var(--success-color) !important;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.2);
+            color: var(--success-color);
+            font-weight: 700;
+        }
+
+        .answer-btn.incorrect {
+            background: rgba(239, 68, 68, 0.15) !important;
+            border-color: var(--error-color) !important;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+            color: var(--error-color);
+            font-weight: 700;
+        }
+
+        .answer-btn [disabled] {
+            cursor: default;
+        }
+
+        .option-indicator {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            transition: var(--transition-smooth);
+            flex-shrink: 0;
+            margin-left: 1rem;
+        }
+
+        .answer-btn:hover:not([disabled]) .option-indicator {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .answer-btn.selected .option-indicator {
+            border-color: var(--accent-purple);
+            background: var(--accent-purple);
+            color: white;
+        }
+
+        .answer-btn.correct .option-indicator {
+            border-color: var(--success-color);
+            background: var(--success-color);
+            color: white;
+            content: "\f00c";
+        }
+
+        .answer-btn.incorrect .option-indicator {
+            border-color: var(--error-color);
+            background: var(--error-color);
+            color: white;
+            content: "\f00d";
+        }
+
+        /* Inline Explanation Panel */
+        .explanation-panel {
+            background: rgba(6, 182, 212, 0.08);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 0 16px 16px 0;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            animation: slideDown 0.3s ease forwards;
+        }
+
+        .explanation-panel h4 {
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .explanation-text {
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Math expressions styling */
+        .math-expr {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-size: 1.15em;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-style: italic;
+        }
+        
+        [data-theme="light"] .math-expr {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .math-block {
+            display: block;
+            text-align: center;
+            margin: 0.75rem auto;
+            padding: 0.5rem;
+            font-size: 1.25em;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            width: fit-content;
+            max-width: 100%;
+        }
+
+        /* Navigation buttons footer */
+        .quiz-footer {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: auto;
+        }
+
+        .quiz-footer .btn {
+            width: auto;
+            min-width: 160px;
+        }
+
+        /* Result View & Diagnostics */
+        .score-circle-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .score-circle {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: var(--input-bg);
+            border: 4px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 16px var(--shadow-color);
+        }
+
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            top: -4px; left: -4px; right: -4px; bottom: -4px;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: var(--accent-cyan);
+            border-right-color: var(--accent-purple);
+            animation: rotateOrbital 4s linear infinite;
+        }
+
+        @keyframes rotateOrbital {
+            to { transform: rotate(360deg); }
+        }
+
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            line-height: 1;
+        }
+
+        .score-max {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .score-grade {
+            font-size: 1.35rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .topic-analysis {
+            background: var(--input-bg);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--card-border);
+        }
+
+        .topic-analysis-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .analysis-item {
+            margin-bottom: 1rem;
+        }
+
+        .analysis-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .analysis-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .analysis-bar-outer {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .analysis-bar-inner {
+            height: 100%;
+            background: var(--accent-purple);
+            border-radius: 4px;
+            transition: width 1s ease-out;
+        }
+
+        /* Review Section in Results */
+        .review-panel {
+            background: var(--input-bg);
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .review-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent-purple);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .review-item {
+            padding: 0.85rem 1rem;
+            background: var(--btn-bg);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition-smooth);
+        }
+
+        .review-item:hover {
+            transform: translateX(4px);
+            background: var(--btn-hover);
+        }
+
+        .review-status-correct {
+            color: var(--success-color);
+            font-weight: 700;
+        }
+
+        .review-status-incorrect {
+            color: var(--error-color);
+            font-weight: 700;
+        }
+
+        /* Review Modal Detail */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            max-width: 650px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            animation: modalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes modalScaleUp {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .modal-title {
+            font-weight: 800;
+            color: var(--accent-cyan);
+            font-size: 1.2rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .close-modal:hover {
+            color: var(--error-color);
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modal-answer-summary {
+            padding: 0.85rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .modal-ans-correct {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .modal-ans-incorrect {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        /* Canvas Confetti */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 99;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-bg);
+            border-radius: 0 20px 20px 0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Footer Copyright */
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        footer a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Animated Orbs -->
+    <div class="ambient-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Canvas Confetti Overlay -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Header navigation bar -->
+    <header>
+        <div class="logo">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>EduQuiz 8</span>
+        </div>
+        <div class="header-controls">
+            <button class="sound-toggle" id="sound-toggle" title="Bật/Tắt âm thanh hiệu ứng" aria-label="Toggle sound">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button class="theme-toggle" id="theme-toggle" title="Chuyển đổi giao diện Sáng/Tối" aria-label="Toggle theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main>
+        <div class="container" id="quiz-container">
+            
+            <!-- 1. SCREEN: CONFIGURATION / LOBBY -->
+            <div class="screen active" id="config-screen">
+                <h1>Khảo Thí Toán Học Lớp 8</h1>
+                <p class="subtitle">Đánh giá năng lực dựa trên các chuyên đề tài nguyên học tập</p>
+                
+                <!-- Topic Checklist -->
+                <div class="options-group">
+                    <div class="group-title">
+                        <span>Chọn chuyên đề ôn tập</span>
+                        <button type="button" class="select-all-btn" id="toggle-all-topics">Bỏ chọn tất cả</button>
+                    </div>
+                    <div class="topic-grid">
+                        <label class="checkbox-label" id="label-topic-0">
+                            <input type="checkbox" class="topic-checkbox" value="0" checked>
+                            <span>7 Hằng đẳng thức</span>
+                        </label>
+                        <label class="checkbox-label" id="label-topic-1">
+                            <input type="checkbox" class="topic-checkbox" value="1" checked>
+                            <span>Hệ thức Vi-ét</span>
+                        </label>
+                        <label class="checkbox-label" id="label-topic-2">
+                            <input type="checkbox" class="topic-checkbox" value="2" checked>
+                            <span>Các loại Tứ giác</span>
+                        </label>
+                        <label class="checkbox-label" id="label-topic-3">
+                            <input type="checkbox" class="topic-checkbox" value="3" checked>
+                            <span>Thales & Đường trung bình</span>
+                        </label>
+                        <label class="checkbox-label" id="label-topic-4">
+                            <input type="checkbox" class="topic-checkbox" value="4" checked>
+                            <span>Phân tích đa thức</span>
+                        </label>
+                        <label class="checkbox-label" id="label-topic-5">
+                            <input type="checkbox" class="topic-checkbox" value="5" checked>
+                            <span>Định lý Pythagore</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Mode Selection -->
+                <div class="options-group">
+                    <div class="group-title">Chọn chế độ làm bài</div>
+                    <div class="mode-selection">
+                        <div class="mode-card active" id="mode-practice" data-mode="practice">
+                            <div class="mode-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                            <div class="mode-name">Luyện Tập Tự Do</div>
+                            <div class="mode-desc">Không giới hạn thời gian, xem đáp án & lời giải chi tiết ngay lập tức sau mỗi câu hỏi.</div>
+                        </div>
+                        <div class="mode-card" id="mode-exam" data-mode="exam">
+                            <div class="mode-icon"><i class="fa-solid fa-stopwatch"></i></div>
+                            <div class="mode-name">Kiểm Tra Thực Tế</div>
+                            <div class="mode-desc">Hệ thống tính giờ đếm ngược. Nhận kết quả, chấm điểm và lời giải sau khi nộp bài thi.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Start Button -->
+                <button type="button" class="btn" id="start-quiz-btn">
+                    <span>Bắt đầu ôn luyện</span>
+                    <i class="fa-solid fa-rocket"></i>
+                </button>
+            </div>
+
+            <!-- 2. SCREEN: QUIZ INTERACTIVE QUESTION -->
+            <div class="screen" id="quiz-screen">
+                <div class="quiz-header">
+                    <div class="quiz-info-pill">
+                        <i class="fa-solid fa-clipboard-question pill-accent"></i>
+                        <span id="question-index-display">Câu 1/18</span>
+                    </div>
+                    <div class="quiz-info-pill" id="score-pill-container">
+                        <i class="fa-solid fa-star pill-accent"></i>
+                        <span>Điểm: <span id="current-score-display">0</span></span>
+                    </div>
+                    <div class="quiz-info-pill" id="timer-pill-container" style="display: none;">
+                        <i class="fa-solid fa-stopwatch pill-timer"></i>
+                        <span id="timer-display" class="pill-timer">15:00</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar-el"></div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="question-card">
+                    <span class="question-tag" id="question-topic-tag">ĐẠI SỐ</span>
+                    <div class="question-text" id="question-text-el">Đang tải câu hỏi...</div>
+                </div>
+
+                <!-- Answer options -->
+                <div class="answers-grid" id="answers-grid-el">
+                    <!-- Option buttons will be dynamically created here -->
+                </div>
+
+                <!-- Inline Explanation Panel (Practice Mode) -->
+                <div class="explanation-panel" id="explanation-panel-el">
+                    <h4><i class="fa-solid fa-lightbulb"></i> Phân tích của Chuyên gia:</h4>
+                    <div class="explanation-text" id="explanation-text-el">Công thức và lời giải chi tiết ở đây...</div>
+                </div>
+
+                <!-- Footer Operations -->
+                <div class="quiz-footer">
+                    <button type="button" class="btn btn-outline" id="quit-quiz-btn">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Thoát</span>
+                    </button>
+                    <button type="button" class="btn" id="next-question-btn" disabled>
+                        <span>Câu tiếp theo</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. SCREEN: RESULTS & ANALYSIS -->
+            <div class="screen" id="result-screen">
+                <h1>Kết Quả Đánh Giá Năng Lực</h1>
+                <p class="subtitle" id="result-subtitle">Báo cáo khảo thí và định hướng học tập cá nhân</p>
+
+                <!-- Circle Score Card -->
+                <div class="score-circle-container">
+                    <div class="score-circle">
+                        <span class="score-value" id="final-score-val">15</span>
+                        <span class="score-max">/ <span id="final-score-max">18</span></span>
+                    </div>
+                    <div class="score-grade" id="final-grade-text">XUẤT SẮC 🌟</div>
+                </div>
+
+                <!-- Topic Analysis / Diagnostic Reports -->
+                <div class="topic-analysis">
+                    <div class="topic-analysis-title">
+                        <i class="fa-solid fa-chart-bar"></i>
+                        <span>Phân tích điểm mạnh & yếu</span>
+                    </div>
+                    <div id="topic-analysis-container">
+                        <!-- Topic score indicators are dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- Review list -->
+                <div class="review-panel">
+                    <div class="review-title">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                        <span>Chi tiết kết quả câu hỏi</span>
+                    </div>
+                    <div class="review-list" id="review-list-el">
+                        <!-- Custom review list item with status indicators -->
+                    </div>
+                </div>
+
+                <!-- Actions footer -->
+                <div class="quiz-footer">
+                    <button type="button" class="btn btn-outline" id="restart-quiz-btn">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        <span>Làm lại bài</span>
+                    </button>
+                    <button type="button" class="btn" id="finish-exit-btn">
+                        <span>Về Trang chủ</span>
+                        <i class="fa-solid fa-house"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal for viewing single review detail -->
+    <div class="modal" id="review-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title" id="modal-topic-title">Xem lại câu hỏi</span>
+                <button type="button" class="close-modal" id="close-modal-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="question-text" id="modal-question-text" style="font-size: 1.15rem; margin-bottom: 0.5rem;">Câu hỏi mẫu?</div>
+                <div class="modal-answer-summary" id="modal-user-selection">Lựa chọn của bạn: A. ...</div>
+                
+                <div class="explanation-panel" id="modal-explanation-panel" style="display: block; margin: 0.5rem 0;">
+                    <h4><i class="fa-solid fa-lightbulb"></i> Phân tích chi tiết:</h4>
+                    <div class="explanation-text" id="modal-explanation-text">Lý thuyết bổ trợ...</div>
+                </div>
+                
+                <div id="modal-resource-link-container" style="margin-top: 0.5rem; font-size: 0.9rem;">
+                    <i class="fa-solid fa-book-open" style="color: var(--accent-cyan);"></i> 
+                    Xem lý thuyết đầy đủ tại: <span id="modal-resource-link"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Copyright -->
+    <footer>
+        <p>Thiết kế bởi <strong>Chuyên gia Thiết kế Đề thi & Khảo thí Giáo dục Lớp 8</strong></p>
+        <p style="margin-top: 5px; font-size: 0.75rem; color: var(--text-muted);">
+            Dựa trên các học liệu ôn tập giữa kì và cuối kì môn Toán lớp 8 của bạn.
+        </p>
+    </footer>
+
+    <!-- Audio & Interactive Engine -->
+    <script>
+        // --- SOUND EFFECTS SYNTHESIZER USING WEB AUDIO API ---
+        // (100% standalone, no external mp3 assets required)
+        class QuizSoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playCorrect() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                
+                // Rising major third (C5 -> E5)
+                this.playTone(523.25, 0.1, now); // C5
+                this.playTone(659.25, 0.12, now + 0.08); // E5
+            }
+
+            playIncorrect() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                
+                // Low buzzer (G2 -> F2)
+                this.playTone(196.00, 0.15, now, 'triangle'); // G2
+                this.playTone(174.61, 0.22, now + 0.08, 'triangle'); // F2
+            }
+
+            playFanfare() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                
+                // Arpeggio C5 -> E5 -> G5 -> C6
+                this.playTone(523.25, 0.12, now); // C5
+                this.playTone(659.25, 0.12, now + 0.1); // E5
+                this.playTone(783.99, 0.12, now + 0.2); // G5
+                this.playTone(1046.50, 0.35, now + 0.3, 'sine', 0.2); // C6
+            }
+
+            playClick() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                this.playTone(800, 0.03, now, 'sine', 0.15);
+            }
+
+            playTone(freq, duration, startTime, type = 'sine', volume = 0.2) {
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    
+                    gain.gain.setValueAtTime(volume, startTime);
+                    // Smooth exponential decay
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+                    
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                } catch (e) {
+                    console.error("Audio error:", e);
+                }
+            }
+        }
+
+        const soundEngine = new QuizSoundEngine();
+
+        // --- QUESTION DATABASE ---
+        // Mapping topics:
+        // 0: 7 Hằng đẳng thức đáng nhớ (7 hằng đẳng thức đáng nhớ.md)
+        // 1: Hệ thức Vi-ét (Hệ thức Vi-ét.md)
+        // 2: Các loại tứ giác (cac loai tu giac.md)
+        // 3: Định lý Thales & Đường trung bình (dinh ly thales va duong trung binh.md)
+        // 4: Phân tích đa thức thành nhân tử (phan tich da thuc thanh nhan tu.md)
+        // 5: Định lý Pythagore (Định lý Pythagore.md)
+
+        const TOPIC_METADATA = [
+            { id: 0, name: "7 Hằng đẳng thức", file: "../03_Resources/7 hằng đẳng thức đáng nhớ.md" },
+            { id: 1, name: "Hệ thức Vi-ét", file: "../03_Resources/Hệ thức Vi-ét.md" },
+            { id: 2, name: "Các loại Tứ giác", file: "../03_Resources/cac loai tu giac.md" },
+            { id: 3, name: "Thales & Đường trung bình", file: "../03_Resources/dinh ly thales va duong trung binh.md" },
+            { id: 4, name: "Phân tích đa thức", file: "../03_Resources/phan tich da thuc thanh nhan tu.md" },
+            { id: 5, name: "Định lý Pythagore", file: "../03_Resources/Định lý Pythagore.md" }
+        ];
+
+        const QUESTION_BANK = [
+            // TOPIC 0: 7 hằng đẳng thức
+            {
+                topicId: 0,
+                question: "Khai triển biểu thức <span class='math-expr'>(x + 3)<sup>2</sup></span> ta được kết quả là:",
+                options: [
+                    "x<sup>2</sup> + 3x + 9",
+                    "x<sup>2</sup> + 6x + 9",
+                    "x<sup>2</sup> + 9",
+                    "x<sup>2</sup> - 6x + 9"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "Áp dụng Hằng đẳng thức số 1: <span class='math-expr'>(A + B)<sup>2</sup> = A<sup>2</sup> + 2AB + B<sup>2</sup></span>.<br>Với <span class='math-expr'>A = x, B = 3</span>, ta có:<br><span class='math-block'>(x + 3)<sup>2</sup> = x<sup>2</sup> + 2 &middot; x &middot; 3 + 3<sup>2</sup> = x<sup>2</sup> + 6x + 9</span>"
+            },
+            {
+                topicId: 0,
+                question: "Quy tắc đan dấu <i>'Cộng &rarr; Trừ &rarr; Cộng &rarr; Trừ'</i> áp dụng cho dạng khai triển của hằng đẳng thức nào sau đây?",
+                options: [
+                    "(A + B)<sup>3</sup>",
+                    "(A - B)<sup>3</sup>",
+                    "A<sup>3</sup> - B<sup>3</sup>",
+                    "(A - B)<sup>2</sup>"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "Theo <b>Mẹo nhớ dấu nhanh</b> trong tài liệu ôn tập:<br>Khi khai triển Lập phương của một hiệu <span class='math-expr'>(A - B)<sup>3</sup></span>, các dấu của hạng tử sẽ đan xen nhau:<br><span class='math-block'>+A<sup>3</sup> - 3A<sup>2</sup>B + 3AB<sup>2</sup> - B<sup>3</sup></span>"
+            },
+            {
+                topicId: 0,
+                question: "Khai triển hằng đẳng thức hiệu hai lập phương <span class='math-expr'>A<sup>3</sup> - B<sup>3</sup></span> có dạng đúng là:",
+                options: [
+                    "(A - B)(A<sup>2</sup> - AB + B<sup>2</sup>)",
+                    "(A - B)(A<sup>2</sup> + AB + B<sup>2</sup>)",
+                    "(A + B)(A<sup>2</sup> - AB + B<sup>2</sup>)",
+                    "(A - B)(A<sup>2</sup> + 2AB + B<sup>2</sup>)"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "Áp dụng Hằng đẳng thức số 7: <span class='math-expr'>A<sup>3</sup> - B<sup>3</sup> = (A - B)(A<sup>2</sup> + AB + B<sup>2</sup>)</span>.<br>Ngoặc thứ nhất có dấu giống đề bài (Trừ), ngoặc thứ hai mang dấu ngược lại (Cộng) và có tên là <i>bình phương thiếu của một tổng</i>."
+            },
+
+            // TOPIC 1: Hệ thức Vi-ét
+            {
+                topicId: 1,
+                question: "Cho phương trình bậc hai <span class='math-expr'>ax<sup>2</sup> + bx + c = 0 (a &ne; 0)</span> có hai nghiệm phân biệt. Tổng <span class='math-expr'>S</span> và tích <span class='math-expr'>P</span> của hai nghiệm đó thỏa mãn:",
+                options: [
+                    "S = -b/a , P = c/a",
+                    "S = b/a , P = -c/a",
+                    "S = -b/a , P = -c/a",
+                    "S = b/a , P = c/a"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "Hệ thức Vi-ét phát biểu rằng nếu phương trình bậc hai có nghiệm thì tổng hai nghiệm là <span class='math-expr'>S = x<sub>1</sub> + x<sub>2</sub> = -b/a</span> và tích hai nghiệm là <span class='math-expr'>P = x<sub>1</sub> &middot; x<sub>2</sub> = c/a</span>."
+            },
+            {
+                topicId: 1,
+                question: "Cho phương trình <span class='math-expr'>x<sup>2</sup> - 5x + 4 = 0</span>. Áp dụng các trường hợp nhẩm nghiệm đặc biệt của Vi-ét, phương trình có hai nghiệm là:",
+                options: [
+                    "x<sub>1</sub> = 1 , x<sub>2</sub> = -4",
+                    "x<sub>1</sub> = -1 , x<sub>2</sub> = -4",
+                    "x<sub>1</sub> = 1 , x<sub>2</sub> = 4",
+                    "x<sub>1</sub> = -1 , x<sub>2</sub> = 4"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "Các hệ số: <span class='math-expr'>a = 1, b = -5, c = 4</span>.<br>Nhận thấy: <span class='math-expr'>a + b + c = 1 + (-5) + 4 = 0</span>.<br>Theo quy tắc nhẩm nghiệm nhanh, phương trình có hai nghiệm:<br><span class='math-block'>x<sub>1</sub> = 1</span><br><span class='math-block'>x<sub>2</sub> = c/a = 4/1 = 4</span>"
+            },
+            {
+                topicId: 1,
+                question: "Nếu phương trình bậc hai <span class='math-expr'>ax<sup>2</sup> + bx + c = 0 (a &ne; 0)</span> có các hệ số thỏa mãn <span class='math-expr'>a - b + c = 0</span> thì hai nghiệm của phương trình sẽ là:",
+                options: [
+                    "x<sub>1</sub> = 1 và x<sub>2</sub> = c/a",
+                    "x<sub>1</sub> = -1 và x<sub>2</sub> = -c/a",
+                    "x<sub>1</sub> = -1 và x<sub>2</sub> = c/a",
+                    "x<sub>1</sub> = 1 và x<sub>2</sub> = -c/a"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "Đây là trường hợp nhẩm nghiệm nhanh đặc biệt thứ hai của định lý Vi-ét. Khi các hệ số thỏa mãn hiệu <span class='math-expr'>a - b + c = 0</span>, phương trình chắc chắn có hai nghiệm là <span class='math-expr'>x<sub>1</sub> = -1</span> và <span class='math-expr'>x<sub>2</sub> = -c/a</span>."
+            },
+
+            // TOPIC 2: Các loại tứ giác
+            {
+                topicId: 2,
+                question: "Cách nào dưới đây là cách thường được sử dụng nhiều nhất để chứng minh một tứ giác là Hình bình hành?",
+                options: [
+                    "Chứng minh tứ giác có các góc đối bằng nhau.",
+                    "Chứng minh tứ giác có các cạnh đối bằng nhau.",
+                    "Chứng minh tứ giác có hai đường chéo cắt nhau tại trung điểm.",
+                    "Chứng minh tứ giác có một cặp cạnh đối vừa song song vừa bằng nhau."
+                ],
+                correctAnswerIndex: 3,
+                explanation: "Theo tài liệu <i>Các loại tứ giác</i>, dấu hiệu <b>tứ giác có một cặp cạnh đối vừa song song vừa bằng nhau</b> là dấu hiệu nhận biết cốt lõi và được dùng nhiều nhất trong các bài toán chứng minh hình học lớp 8."
+            },
+            {
+                topicId: 2,
+                question: "Điều kiện nào biến một Hình bình hành trở thành một Hình chữ nhật?",
+                options: [
+                    "Hình bình hành có hai cạnh kề bằng nhau.",
+                    "Hình bình hành có hai đường chéo vuông góc.",
+                    "Hình bình hành có hai đường chéo bằng nhau hoặc có 1 góc vuông.",
+                    "Hình bình hành có các góc đối bằng nhau từng đôi một."
+                ],
+                correctAnswerIndex: 2,
+                explanation: "Theo dấu hiệu nhận biết: Một <i>Hình bình hành</i> có 1 góc vuông hoặc có hai đường chéo bằng nhau thì biến thành <i>Hình chữ nhật</i>. Các đáp án khác như hai đường chéo vuông góc hoặc hai cạnh kề bằng nhau biến hình bình hành thành hình thoi."
+            },
+            {
+                topicId: 2,
+                question: "Hình vuông được mệnh danh là 'Đỉnh cao của tứ giác'. Ta có thể chứng minh một Hình thoi là một Hình vuông bằng cách chỉ ra thêm:",
+                options: [
+                    "Hình thoi có 2 đường chéo vuông góc với nhau.",
+                    "Hình thoi có 1 góc vuông hoặc có 2 đường chéo bằng nhau.",
+                    "Hình thoi có 2 cạnh kề bằng nhau.",
+                    "Hình thoi có các cạnh đối song song."
+                ],
+                correctAnswerIndex: 1,
+                explanation: "Hình vuông tích hợp đầy đủ tính chất của cả hình chữ nhật và hình thoi. Vì hình thoi đã có sẵn 2 đường chéo vuông góc và các cạnh bằng nhau, nên chỉ cần có thêm <b>1 góc vuông</b> hoặc <b>2 đường chéo bằng nhau</b> thì nó sẽ là hình vuông."
+            },
+
+            // TOPIC 3: Thales & Đường trung bình
+            {
+                topicId: 3,
+                question: "Xét tam giác ABC có đường thẳng d song song với BC, cắt AB tại M và AC tại N. Tỉ số nào sau đây đúng theo định lý Thales?",
+                options: [
+                    "AM/MB = AN/NC",
+                    "AM/AB = NC/AN",
+                    "AM/MB = NC/AN",
+                    "MB/AB = AN/AC"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "Định lý Thales thuận phát biểu: Nếu một đường thẳng song song với một cạnh của tam giác và cắt hai cạnh còn lại thì nó định ra trên hai cạnh đó các đoạn thẳng tương ứng tỉ lệ. Do đó: <span class='math-expr'>AM/MB = AN/NC</span> hoặc <span class='math-expr'>AM/AB = AN/AC</span>."
+            },
+            {
+                topicId: 3,
+                question: "Đường trung bình của tam giác là đoạn thẳng nối hai vị trí đặc biệt nào của tam giác, và nó có tính chất gì?",
+                options: [
+                    "Nối đỉnh với trung điểm cạnh đối diện; bằng nửa cạnh đó.",
+                    "Nối trung điểm hai cạnh; song song với cạnh thứ ba và bằng nửa cạnh ấy.",
+                    "Nối hai chân đường cao; song song với cạnh đáy.",
+                    "Nối trung điểm hai cạnh; vuông góc với cạnh đáy."
+                ],
+                correctAnswerIndex: 1,
+                explanation: "Theo định nghĩa và tính chất: Đường trung bình của tam giác nối trung điểm hai cạnh bên, song song với cạnh thứ ba và bằng 1/2 độ dài cạnh ấy (<span class='math-expr'>DE // BC</span> và <span class='math-expr'>DE = 1/2 BC</span>)."
+            },
+            {
+                topicId: 3,
+                question: "Cho tam giác ABC có cạnh <span class='math-expr'>BC = 12 cm</span>. Gọi D và E lần lượt là trung điểm của AB và AC. Độ dài của đoạn thẳng DE là:",
+                options: [
+                    "24 cm",
+                    "8 cm",
+                    "6 cm",
+                    "4 cm"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "Do D, E lần lượt là trung điểm của AB và AC nên DE là đường trung bình của tam giác ABC.<br>Áp dụng tính chất đường trung bình:<br><span class='math-block'>DE = BC / 2 = 12 / 2 = 6 cm</span>"
+            },
+
+            // TOPIC 4: Phân tích đa thức
+            {
+                topicId: 4,
+                question: "Phân tích đa thức <span class='math-expr'>3x<sup>2</sup> - 6x</span> thành nhân tử bằng phương pháp đặt nhân tử chung ta được:",
+                options: [
+                    "3(x<sup>2</sup> - 2x)",
+                    "3x(x - 2)",
+                    "3x(x + 2)",
+                    "x(3x - 6)"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "Nhận thấy cả hai hạng tử <span class='math-expr'>3x<sup>2</sup></span> và <span class='math-expr'>6x</span> đều chia hết cho <span class='math-expr'>3x</span>. Ta đặt <span class='math-expr'>3x</span> ra ngoài làm nhân tử chung:<br><span class='math-block'>3x<sup>2</sup> - 6x = 3x &middot; x - 3x &middot; 2 = 3x(x - 2)</span>"
+            },
+            {
+                topicId: 4,
+                question: "Kết quả của việc phân tích đa thức <span class='math-expr'>xy + 3y + 2x + 6</span> thành nhân tử bằng phương pháp nhóm hạng tử là:",
+                options: [
+                    "(x + 3)(y + 2)",
+                    "(x - 3)(y + 2)",
+                    "(x + 3)(y - 2)",
+                    "(x - 3)(y - 2)"
+                ],
+                correctAnswerIndex: 0,
+                explanation: "Nhóm các hạng tử có đặc điểm chung:<br><span class='math-block'>xy + 3y + 2x + 6 = (xy + 3y) + (2x + 6)</span><br><span class='math-block'>= y(x + 3) + 2(x + 3) = (x + 3)(y + 2)</span>"
+            },
+            {
+                topicId: 4,
+                question: "Khi thực hiện phân tích đa thức thành nhân tử bằng phương pháp nhóm hạng tử, phép biến đổi nào dưới đây bị **SAI** về dấu?",
+                options: [
+                    "-x - y = -(x + y)",
+                    "-x + y = -(x - y)",
+                    "-x + y = -(x + y)",
+                    "x - y = -(-x + y)"
+                ],
+                correctAnswerIndex: 2,
+                explanation: "Khi đặt dấu trừ '$-$' ra phía trước ngoặc nhóm, ta bắt buộc phải đổi dấu tất cả hạng tử bên trong ngoặc.<br>Phát biểu sai là: <span class='math-expr'>-x + y = -(x + y)</span> (vì thực tế vế phải khai triển ra là <span class='math-expr'>-x - y</span>).<br>Biến đổi đúng phải là: <span class='math-expr'>-x + y = -(x - y)</span>."
+            },
+
+            // TOPIC 5: Định lý Pythagore
+            {
+                topicId: 5,
+                question: "Trong tam giác vuông ABC vuông tại A, hệ thức định lý Pythagore biểu diễn mối quan hệ giữa ba cạnh là:",
+                options: [
+                    "AB<sup>2</sup> + BC<sup>2</sup> = AC<sup>2</sup>",
+                    "AB<sup>2</sup> + AC<sup>2</sup> = BC<sup>2</sup>",
+                    "AC<sup>2</sup> + BC<sup>2</sup> = AB<sup>2</sup>",
+                    "AB + AC = BC"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "Định lý Pythagore: Trong tam giác vuông, tổng bình phương hai cạnh góc vuông bằng bình phương cạnh huyền.<br>Vì tam giác ABC vuông tại A nên cạnh đối diện góc A là BC (cạnh huyền). Do đó:<br><span class='math-block'>AB<sup>2</sup> + AC<sup>2</sup> = BC<sup>2</sup></span>"
+            },
+            {
+                topicId: 5,
+                question: "Trong các bộ độ dài sau, bộ ba số nào **KHÔNG PHẢI** là bộ ba số Pythagore (độ dài 3 cạnh của một tam giác vuông)?",
+                options: [
+                    "3 - 4 - 5",
+                    "6 - 8 - 10",
+                    "5 - 12 - 13",
+                    "4 - 5 - 6"
+                ],
+                correctAnswerIndex: 3,
+                explanation: "Kiểm tra hệ thức Pythagore: <span class='math-expr'>a<sup>2</sup> + b<sup>2</sup> = c<sup>2</sup></span>:<br>- 3, 4, 5: <span class='math-expr'>3<sup>2</sup> + 4<sup>2</sup> = 9 + 16 = 25 = 5<sup>2</sup></span> (Đúng)<br>- 6, 8, 10: <span class='math-expr'>6<sup>2</sup> + 8<sup>2</sup> = 36 + 64 = 100 = 10<sup>2</sup></span> (Đúng)<br>- 5, 12, 13: <span class='math-expr'>5<sup>2</sup> + 12<sup>2</sup> = 25 + 144 = 169 = 13<sup>2</sup></span> (Đúng)<br>- 4, 5, 6: <span class='math-expr'>4<sup>2</sup> + 5<sup>2</sup> = 16 + 25 = 41 &ne; 6<sup>2</sup> = 36</span> (Sai)"
+            },
+            {
+                topicId: 5,
+                question: "Cho tam giác ABC vuông tại A, biết độ dài hai cạnh góc vuông là <span class='math-expr'>AB = 6 cm</span>, <span class='math-expr'>AC = 8 cm</span>. Tính độ dài cạnh huyền BC.",
+                options: [
+                    "7 cm",
+                    "10 cm",
+                    "14 cm",
+                    "100 cm"
+                ],
+                correctAnswerIndex: 1,
+                explanation: "Áp dụng định lý Pythagore vào tam giác vuông ABC:<br><span class='math-block'>BC<sup>2</sup> = AB<sup>2</sup> + AC<sup>2</sup></span><br><span class='math-block'>BC<sup>2</sup> = 6<sup>2</sup> + 8<sup>2</sup> = 36 + 64 = 100</span><br><span class='math-block'>&rArr; BC = &radic;100 = 10 cm</span>"
+            }
+        ];
+
+        // --- APP STATE ---
+        let currentQuestions = [];
+        let currentQuestionIdx = 0;
+        let score = 0;
+        let selectedAnswerIdx = null;
+        let answersState = []; // Tracks user answers: { questionObj, selectedIdx, isCorrect }
+        
+        let quizMode = "practice"; // "practice" or "exam"
+        let timerInterval = null;
+        let timeLeft = 0; // seconds
+        let totalExamTime = 15 * 60; // 15 minutes in seconds
+
+        // --- DOM ELEMENTS ---
+        const themeToggle = document.getElementById("theme-toggle");
+        const soundToggle = document.getElementById("sound-toggle");
+        
+        const configScreen = document.getElementById("config-screen");
+        const quizScreen = document.getElementById("quiz-screen");
+        const resultScreen = document.getElementById("result-screen");
+        const quizContainer = document.getElementById("quiz-container");
+
+        const startQuizBtn = document.getElementById("start-quiz-btn");
+        const toggleAllTopicsBtn = document.getElementById("toggle-all-topics");
+        const topicCheckboxes = document.querySelectorAll(".topic-checkbox");
+        const modeCards = document.querySelectorAll(".mode-card");
+
+        const questionIndexDisplay = document.getElementById("question-index-display");
+        const scorePillContainer = document.getElementById("score-pill-container");
+        const currentScoreDisplay = document.getElementById("current-score-display");
+        const timerPillContainer = document.getElementById("timer-pill-container");
+        const timerDisplay = document.getElementById("timer-display");
+        const progressBarEl = document.getElementById("progress-bar-el");
+        const questionTopicTag = document.getElementById("question-topic-tag");
+        const questionTextEl = document.getElementById("question-text-el");
+        const answersGridEl = document.getElementById("answers-grid-el");
+        const explanationPanelEl = document.getElementById("explanation-panel-el");
+        const explanationTextEl = document.getElementById("explanation-text-el");
+        
+        const quitQuizBtn = document.getElementById("quit-quiz-btn");
+        const nextQuestionBtn = document.getElementById("next-question-btn");
+
+        const finalScoreVal = document.getElementById("final-score-val");
+        const finalScoreMax = document.getElementById("final-score-max");
+        const finalGradeText = document.getElementById("final-grade-text");
+        const topicAnalysisContainer = document.getElementById("topic-analysis-container");
+        const reviewListEl = document.getElementById("review-list-el");
+        
+        const restartQuizBtn = document.getElementById("restart-quiz-btn");
+        const finishExitBtn = document.getElementById("finish-exit-btn");
+
+        // Modal Elements
+        const reviewModal = document.getElementById("review-modal");
+        const modalTopicTitle = document.getElementById("modal-topic-title");
+        const modalQuestionText = document.getElementById("modal-question-text");
+        const modalUserSelection = document.getElementById("modal-user-selection");
+        const modalExplanationText = document.getElementById("modal-explanation-text");
+        const modalResourceLink = document.getElementById("modal-resource-link");
+        const closeModalBtn = document.getElementById("close-modal-btn");
+
+        // --- CONFETTI ANIMATION LOGIC ---
+        const canvas = document.getElementById("confetti-canvas");
+        const ctx = canvas.getContext("2d");
+        let confettiActive = false;
+        let confettiPieces = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        class ConfettiPiece {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * -canvas.height - 20;
+                this.size = Math.random() * 8 + 6;
+                this.color = ['#06b6d4', '#a855f7', '#ec4899', '#22c55e', '#f59e0b', '#3b82f6'][Math.floor(Math.random() * 6)];
+                this.speedY = Math.random() * 3 + 2;
+                this.speedX = Math.random() * 2 - 1;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 4 - 2;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.rotation += this.rotationSpeed;
+                
+                if (this.y > canvas.height) {
+                    this.y = -20;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function startConfetti() {
+            resizeCanvas();
+            confettiActive = true;
+            canvas.style.display = "block";
+            confettiPieces = [];
+            for (let i = 0; i < 150; i++) {
+                confettiPieces.push(new ConfettiPiece());
+            }
+            animateConfetti();
+        }
+
+        function stopConfetti() {
+            confettiActive = false;
+            canvas.style.display = "none";
+        }
+
+        function animateConfetti() {
+            if (!confettiActive) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            confettiPieces.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            requestAnimationFrame(animateConfetti);
+        }
+
+        // --- THEME & SOUND CONTROLS ---
+        // Load settings from localStorage
+        const savedTheme = localStorage.getItem("quiz-theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        updateThemeIcon(savedTheme);
+
+        const savedSound = localStorage.getItem("quiz-sound") || "enabled";
+        soundEngine.enabled = (savedSound === "enabled");
+        updateSoundIcon(soundEngine.enabled);
+
+        themeToggle.addEventListener("click", () => {
+            soundEngine.playClick();
+            const currentTheme = document.documentElement.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
+            
+            document.documentElement.setAttribute("data-theme", newTheme);
+            localStorage.setItem("quiz-theme", newTheme);
+            updateThemeIcon(newTheme);
+        });
+
+        soundToggle.addEventListener("click", () => {
+            soundEngine.enabled = !soundEngine.enabled;
+            localStorage.setItem("quiz-sound", soundEngine.enabled ? "enabled" : "disabled");
+            updateSoundIcon(soundEngine.enabled);
+            soundEngine.playClick();
+        });
+
+        function updateThemeIcon(theme) {
+            const icon = themeToggle.querySelector("i");
+            if (theme === "dark") {
+                icon.className = "fa-solid fa-sun";
+                themeToggle.title = "Chuyển sang giao diện Sáng";
+            } else {
+                icon.className = "fa-solid fa-moon";
+                themeToggle.title = "Chuyển sang giao diện Tối";
+            }
+        }
+
+        function updateSoundIcon(enabled) {
+            const icon = soundToggle.querySelector("i");
+            if (enabled) {
+                icon.className = "fa-solid fa-volume-high";
+                soundToggle.title = "Tắt âm thanh hiệu ứng";
+            } else {
+                icon.className = "fa-solid fa-volume-xmark";
+                soundToggle.title = "Bật âm thanh hiệu ứng";
+            }
+        }
+
+        // --- CONFIG SCREEN INTERACTIVES ---
+        // Select All / Deselect All Toggle for topics
+        let allTopicsSelected = true;
+        toggleAllTopicsBtn.addEventListener("click", () => {
+            soundEngine.playClick();
+            allTopicsSelected = !allTopicsSelected;
+            
+            topicCheckboxes.forEach(cb => {
+                cb.checked = allTopicsSelected;
+            });
+            
+            toggleAllTopicsBtn.textContent = allTopicsSelected ? "Bỏ chọn tất cả" : "Chọn tất cả";
+        });
+
+        // Mode cards interactive selection
+        modeCards.forEach(card => {
+            card.addEventListener("click", () => {
+                soundEngine.playClick();
+                modeCards.forEach(c => c.classList.remove("active"));
+                card.classList.add("active");
+                quizMode = card.getAttribute("data-mode");
+            });
+        });
+
+        // Make checkbox labels visually responsive
+        topicCheckboxes.forEach(cb => {
+            cb.addEventListener("change", () => {
+                soundEngine.playClick();
+                // Check if at least one checkbox is checked
+                const checkedCount = document.querySelectorAll(".topic-checkbox:checked").length;
+                startQuizBtn.disabled = (checkedCount === 0);
+                
+                // Keep the state of Select All button updated
+                if (checkedCount === topicCheckboxes.length) {
+                    allTopicsSelected = true;
+                    toggleAllTopicsBtn.textContent = "Bỏ chọn tất cả";
+                } else if (checkedCount === 0) {
+                    allTopicsSelected = false;
+                    toggleAllTopicsBtn.textContent = "Chọn tất cả";
+                }
+            });
+        });
+
+        // --- QUIZ GAME ENGINE PLAY LOGIC ---
+        startQuizBtn.addEventListener("click", () => {
+            soundEngine.playClick();
+            
+            // 1. Gather selected topics
+            const selectedTopicIds = Array.from(document.querySelectorAll(".topic-checkbox:checked"))
+                .map(cb => parseInt(cb.value));
+
+            if (selectedTopicIds.length === 0) {
+                alert("Vui lòng chọn ít nhất một chuyên đề để ôn tập!");
+                return;
+            }
+
+            // 2. Filter and shuffle questions
+            currentQuestions = QUESTION_BANK.filter(q => selectedTopicIds.includes(q.topicId));
+            
+            // Shuffle questions to make it a dynamic exam every time
+            shuffleArray(currentQuestions);
+
+            // 3. Reset states
+            currentQuestionIdx = 0;
+            score = 0;
+            answersState = [];
+            
+            // 4. Configure based on mode
+            if (quizMode === "practice") {
+                scorePillContainer.style.display = "flex";
+                timerPillContainer.style.display = "none";
+            } else {
+                // Exam mode
+                scorePillContainer.style.display = "none"; // Hide score during exam to reduce stress
+                timerPillContainer.style.display = "flex";
+                timeLeft = totalExamTime;
+                updateTimerDisplay();
+                
+                // Clear any previous interval
+                if (timerInterval) clearInterval(timerInterval);
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        soundEngine.playIncorrect();
+                        alert("Hết giờ làm bài! Hệ thống tự động nộp bài.");
+                        finishQuiz();
+                    }
+                }, 1000);
+            }
+
+            // 5. Load first question and swap screen
+            loadQuestion();
+            switchScreen(quizScreen);
+        });
+
+        // Utility to shuffle array elements
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Pulsing warn color when less than 1 minute left
+            if (timeLeft <= 60) {
+                timerDisplay.classList.add("timer-warning");
+            } else {
+                timerDisplay.classList.remove("timer-warning");
+            }
+        }
+
+        function loadQuestion() {
+            selectedAnswerIdx = null;
+            nextQuestionBtn.disabled = true;
+            explanationPanelEl.style.display = "none";
+
+            const q = currentQuestions[currentQuestionIdx];
+            
+            // Update Headers
+            questionIndexDisplay.textContent = `Câu ${currentQuestionIdx + 1}/${currentQuestions.length}`;
+            currentScoreDisplay.textContent = score;
+            
+            // Progress Bar Animation
+            const progressPercent = ((currentQuestionIdx) / currentQuestions.length) * 100;
+            progressBarEl.style.width = `${progressPercent}%`;
+
+            // Set Topic Tag & Texts
+            const topicMeta = TOPIC_METADATA.find(t => t.id === q.topicId);
+            questionTopicTag.textContent = topicMeta.name;
+            questionTextEl.innerHTML = q.question;
+
+            // Render Answers
+            answersGridEl.innerHTML = "";
+            const letters = ['A', 'B', 'C', 'D'];
+            
+            q.options.forEach((optText, index) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "answer-btn";
+                btn.id = `opt-${index}`;
+                btn.innerHTML = `
+                    <span>${letters[index]}. ${optText}</span>
+                    <span class="option-indicator">${letters[index]}</span>
+                `;
+                
+                btn.addEventListener("click", () => handleSelectOption(index));
+                answersGridEl.appendChild(btn);
+            });
+        }
+
+        function handleSelectOption(index) {
+            if (selectedAnswerIdx !== null && quizMode === "practice") return; // In practice, selection is final
+
+            soundEngine.playClick();
+            
+            // Remove previous selections (mostly for exam mode where users can change answers before hitting submit)
+            const optionButtons = answersGridEl.querySelectorAll(".answer-btn");
+            optionButtons.forEach(btn => btn.classList.remove("selected"));
+
+            selectedAnswerIdx = index;
+            const selectedBtn = document.getElementById(`opt-${index}`);
+            selectedBtn.classList.add("selected");
+
+            if (quizMode === "practice") {
+                // Instantly grade in practice mode
+                gradePracticeQuestion(index);
+            } else {
+                // Exam mode: allow selecting, next button enabled, grade at the end
+                nextQuestionBtn.disabled = false;
+            }
+        }
+
+        function gradePracticeQuestion(selectedIdx) {
+            const q = currentQuestions[currentQuestionIdx];
+            const isCorrect = (selectedIdx === q.correctAnswerIndex);
+            
+            const optionButtons = answersGridEl.querySelectorAll(".answer-btn");
+            
+            // Disable all options
+            optionButtons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === q.correctAnswerIndex) {
+                    btn.classList.add("correct");
+                }
+                if (idx === selectedIdx && !isCorrect) {
+                    btn.classList.add("incorrect");
+                }
+            });
+
+            // Save state
+            answersState.push({
+                questionObj: q,
+                selectedIdx: selectedIdx,
+                isCorrect: isCorrect
+            });
+
+            if (isCorrect) {
+                score++;
+                currentScoreDisplay.textContent = score;
+                soundEngine.playCorrect();
+            } else {
+                soundEngine.playIncorrect();
+            }
+
+            // Show explanation
+            explanationTextEl.innerHTML = q.explanation;
+            explanationPanelEl.style.display = "block";
+            
+            // Enable next button
+            nextQuestionBtn.disabled = false;
+        }
+
+        // Action when pressing next question / finish
+        nextQuestionBtn.addEventListener("click", () => {
+            soundEngine.playClick();
+
+            if (quizMode === "exam") {
+                // In Exam mode, record answers only when clicking Next
+                const q = currentQuestions[currentQuestionIdx];
+                const isCorrect = (selectedAnswerIdx === q.correctAnswerIndex);
+                
+                answersState.push({
+                    questionObj: q,
+                    selectedIdx: selectedAnswerIdx,
+                    isCorrect: isCorrect
+                });
+                
+                if (isCorrect) score++;
+            }
+
+            currentQuestionIdx++;
+
+            if (currentQuestionIdx < currentQuestions.length) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        });
+
+        // Cancel / Quit button handler
+        quitQuizBtn.addEventListener("click", () => {
+            soundEngine.playClick();
+            if (confirm("Bạn có chắc chắn muốn thoát bài trắc nghiệm này? Kết quả hiện tại sẽ không được lưu.")) {
+                if (timerInterval) clearInterval(timerInterval);
+                switchScreen(configScreen);
+            }
+        });
+
+        // Finish and render diagnostic report
+        function finishQuiz() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            // Final progress bar full
+            progressBarEl.style.width = "100%";
+
+            // Fill final values
+            finalScoreVal.textContent = score;
+            finalScoreMax.textContent = currentQuestions.length;
+
+            // Generate grade evaluation
+            const percentage = (score / currentQuestions.length) * 100;
+            let grade = "";
+            let sub = "";
+            let triggerConfetti = false;
+
+            if (percentage === 100) {
+                grade = "ĐẠT ĐIỂM TUYỆT ĐỐI! 🏆";
+                sub = "Tuyệt hảo! Bạn đã nắm vững 100% tất cả các chuyên đề học tập lớp 8.";
+                triggerConfetti = true;
+            } else if (percentage >= 85) {
+                grade = "XUẤT SẮC 🌟";
+                sub = "Phong độ học tập đỉnh cao! Bạn đã sẵn sàng bứt phá điểm số cao nhất.";
+                triggerConfetti = true;
+            } else if (percentage >= 70) {
+                grade = "ĐẠT LOẠI GIỎI 👍";
+                sub = "Rất tốt! Bạn hiểu sâu bài học, chỉ cần chỉnh sửa vài lỗi nhỏ.";
+            } else if (percentage >= 50) {
+                grade = "ĐẠT LOẠI KHÁ 👌";
+                sub = "Khá ổn. Hãy ôn lại những câu làm sai để nắm chắc lý thuyết hơn.";
+            } else {
+                grade = "CẦN CỐ GẮNG HƠN 📖";
+                sub = "Đừng nản chí! Hãy xem kỹ lời giải chi tiết và ôn lại các học liệu tương ứng.";
+            }
+
+            finalGradeText.textContent = grade;
+            document.getElementById("result-subtitle").textContent = sub;
+
+            if (triggerConfetti) {
+                soundEngine.playFanfare();
+                startConfetti();
+                setTimeout(stopConfetti, 6000);
+            } else {
+                soundEngine.playCorrect();
+            }
+
+            // --- RENDER TOPIC ANALYSIS (Diagnostic) ---
+            topicAnalysisContainer.innerHTML = "";
+            
+            // Calculate scores by topic
+            const topicScores = {}; // topicId -> { total, correct }
+            
+            // Seed selected topics with 0
+            const selectedTopicIds = Array.from(document.querySelectorAll(".topic-checkbox:checked"))
+                .map(cb => parseInt(cb.value));
+            
+            selectedTopicIds.forEach(tid => {
+                topicScores[tid] = { total: 0, correct: 0 };
+            });
+
+            answersState.forEach(ans => {
+                const tid = ans.questionObj.topicId;
+                if (topicScores[tid]) {
+                    topicScores[tid].total++;
+                    if (ans.isCorrect) topicScores[tid].correct++;
+                }
+            });
+
+            // Populate the bar indicators
+            Object.keys(topicScores).forEach(tidStr => {
+                const tid = parseInt(tidStr);
+                const stat = topicScores[tid];
+                const topicMeta = TOPIC_METADATA.find(t => t.id === tid);
+                
+                if (stat.total === 0) return; // Skip if no questions generated
+
+                const percent = Math.round((stat.correct / stat.total) * 100);
+                let colorClass = "var(--accent-purple)";
+                if (percent >= 80) colorClass = "var(--success-color)";
+                else if (percent < 50) colorClass = "var(--error-color)";
+
+                const item = document.createElement("div");
+                item.className = "analysis-item";
+                item.innerHTML = `
+                    <div class="analysis-label-row">
+                        <span>${topicMeta.name}</span>
+                        <span>Đúng ${stat.correct}/${stat.total} (${percent}%)</span>
+                    </div>
+                    <div class="analysis-bar-outer">
+                        <div class="analysis-bar-inner" style="width: ${percent}%; background-color: ${colorClass}"></div>
+                    </div>
+                `;
+                topicAnalysisContainer.appendChild(item);
+            });
+
+            // --- RENDER DETAILED QUESTION REVIEW LIST ---
+            reviewListEl.innerHTML = "";
+            const letters = ['A', 'B', 'C', 'D'];
+
+            answersState.forEach((ans, idx) => {
+                const item = document.createElement("div");
+                item.className = "review-item";
+                
+                const qTextSnippet = ans.questionObj.question.replace(/<[^>]*>/g, '').substring(0, 50) + "...";
+                const isCorrectStr = ans.isCorrect 
+                    ? `<span class="review-status-correct"><i class="fa-solid fa-check"></i> Đúng</span>`
+                    : `<span class="review-status-incorrect"><i class="fa-solid fa-xmark"></i> Sai</span>`;
+
+                item.innerHTML = `
+                    <div style="display:flex; flex-direction:column; gap: 2px;">
+                        <span style="font-size:0.8rem; font-weight:700; color:var(--accent-cyan); text-transform:uppercase;">
+                            Câu ${idx + 1} - ${TOPIC_METADATA.find(t => t.id === ans.questionObj.topicId).name}
+                        </span>
+                        <span style="font-size:0.95rem; font-weight:600;">${qTextSnippet}</span>
+                    </div>
+                    <div>${isCorrectStr}</div>
+                `;
+
+                // Open Modal on click to inspect answer, formulas and link to resource
+                item.addEventListener("click", () => {
+                    soundEngine.playClick();
+                    openReviewModal(ans, idx + 1);
+                });
+
+                reviewListEl.appendChild(item);
+            });
+
+            switchScreen(resultScreen);
+        }
+
+        // Modal inspector functions
+        function openReviewModal(ans, qNum) {
+            const q = ans.questionObj;
+            const topicMeta = TOPIC_METADATA.find(t => t.id === q.topicId);
+            const letters = ['A', 'B', 'C', 'D'];
+            
+            modalTopicTitle.textContent = `Câu số ${qNum} - ${topicMeta.name}`;
+            modalQuestionText.innerHTML = q.question;
+            
+            // Format selections
+            let selText = "";
+            if (ans.selectedIdx === null) {
+                selText = "Không trả lời";
+                modalUserSelection.className = "modal-answer-summary modal-ans-incorrect";
+            } else {
+                selText = `Lựa chọn của bạn: ${letters[ans.selectedIdx]}. ${q.options[ans.selectedIdx]}`;
+                modalUserSelection.className = ans.isCorrect 
+                    ? "modal-answer-summary modal-ans-correct" 
+                    : "modal-answer-summary modal-ans-incorrect";
+            }
+            
+            // If incorrect, append correct answer hint
+            if (!ans.isCorrect) {
+                selText += `<br><span style="color:var(--success-color)">Đáp án đúng: ${letters[q.correctAnswerIndex]}. ${q.options[q.correctAnswerIndex]}</span>`;
+            }
+            modalUserSelection.innerHTML = selText;
+            
+            // Explanation
+            modalExplanationText.innerHTML = q.explanation;
+            
+            // Set resource markdown link
+            modalResourceLink.innerHTML = `<a href="${topicMeta.file}" target="_blank" style="color: var(--accent-cyan); font-weight:700; text-decoration: underline;">${topicMeta.file.split('/').pop()}</a>`;
+            
+            reviewModal.classList.add("active");
+        }
+
+        // Close modal
+        closeModalBtn.addEventListener("click", () => {
+            soundEngine.playClick();
+            reviewModal.classList.remove("active");
+        });
+
+        // Close modal when clicking outside contents
+        window.addEventListener("click", (e) => {
+            if (e.target === reviewModal) {
+                reviewModal.classList.remove("active");
+            }
+        });
+
+        // Restart actions
+        restartQuizBtn.addEventListener("click", () => {
+            soundEngine.playClick();
+            switchScreen(configScreen);
+        });
+
+        finishExitBtn.addEventListener("click", () => {
+            soundEngine.playClick();
+            switchScreen(configScreen);
+        });
+
+        // Utility to switch active views
+        function switchScreen(targetScreen) {
+            document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+            targetScreen.classList.add("active");
+            
+            // Scroll container to top
+            quizContainer.scrollTop = 0;
+        }
+
+    </script>
+</body>
+</html>

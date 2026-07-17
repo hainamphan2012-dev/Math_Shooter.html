@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Trò chơi bắn súng không gian 2D kết hợp ôn thi Toán 8, giúp học sinh củng cố kiến thức qua phản xạ nhắm bắn đáp án.">
+    <title>Galaxy Math Defender: Chiến Binh Không Gian Toán 8</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --laser-cyan: #06b6d4;
+            --plasma-purple: #a855f7;
+            --star-gold: #f59e0b;
+            --hp-ruby: #ef4444;
+            --success-green: #10b981;
+            --bg-space: radial-gradient(ellipse at top, #1b0c30 0%, #05010a 70%);
+            --card-bg: rgba(10, 5, 20, 0.75);
+            --card-border: rgba(6, 182, 212, 0.2);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --font-sci: 'Orbitron', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-space);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        /* Ambient */
+        .amb { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .amb div { position: absolute; border-radius: 50%; filter: blur(100px); opacity: .12; }
+        .amb .a1 { width: 400px; height: 400px; background: var(--hp-ruby); top: 10%; left: 5%; animation: of 22s infinite ease-in-out alternate; }
+        .amb .a2 { width: 500px; height: 500px; background: var(--star-gold); bottom: 5%; right: 5%; animation: of 22s infinite ease-in-out alternate-reverse; }
+        @keyframes of { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(40px,30px) scale(1.1)} }
+
+        /* Header */
+        header { padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); background: rgba(5,1,10,.5); backdrop-filter: blur(10px); z-index: 10; }
+        .logo { font-family: var(--font-sci); font-weight: 800; font-size: 1.3rem; color: var(--laser-cyan); letter-spacing: .1em; display: flex; align-items: center; gap: .75rem; text-shadow: 0 0 10px rgba(6,182,212,.5); }
+        .hdr-btns { display: flex; gap: .6rem; }
+        .hdr-btn { background: rgba(6,182,212,.05); border: 1px solid var(--card-border); color: var(--text-main); width: 40px; height: 40px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all .2s ease; }
+        .hdr-btn:hover { border-color: var(--laser-cyan); color: var(--laser-cyan); box-shadow: 0 0 12px rgba(6,182,212,.3); }
+
+        /* Main */
+        main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 1.5rem 1rem; z-index: 5; }
+        .viewport {
+            width: 100%; max-width: 980px;
+            background: var(--card-bg); border: 2px solid var(--card-border); border-radius: 24px;
+            padding: 2rem; box-shadow: 0 20px 50px rgba(0,0,0,.6);
+            backdrop-filter: blur(14px); position: relative;
+        }
+        .view { display: none; flex-direction: column; animation: vIn .3s ease-out forwards; }
+        .view.active { display: flex; }
+        @keyframes vIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+        /* Sci-fi button */
+        .btn-sf {
+            font-family: var(--font-sci); background: rgba(6,182,212,.1); border: 2px solid var(--laser-cyan);
+            color: var(--laser-cyan); padding: 1rem 2.2rem; border-radius: 12px; font-weight: 700;
+            font-size: 1.05rem; letter-spacing: .1em; cursor: pointer; transition: all .2s ease;
+            display: inline-flex; align-items: center; gap: .75rem;
+            box-shadow: 0 0 15px rgba(6,182,212,.25); text-transform: uppercase;
+        }
+        .btn-sf:hover { background: var(--laser-cyan); color: #05010a; box-shadow: 0 0 25px rgba(6,182,212,.6); transform: translateY(-2px); }
+
+        /* Title screen */
+        .title-layout { text-align: center; padding: 2rem 1rem; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+        .title-h { font-family: var(--font-sci); font-size: 2.6rem; font-weight: 900; background: linear-gradient(135deg, var(--laser-cyan), var(--plasma-purple), #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: .05em; line-height: 1.2; }
+        .sub-t { color: var(--text-muted); max-width: 520px; font-size: 1rem; line-height: 1.5; }
+        .instr-box { background: rgba(0,0,0,.3); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem 1.5rem; width: 100%; max-width: 560px; text-align: left; font-size: .9rem; color: var(--text-muted); display: flex; flex-direction: column; gap: .6rem; }
+        .kr { display: flex; align-items: center; gap: .75rem; }
+        .kc { background: #334155; color: white; padding: .25rem .6rem; border-radius: 6px; border-bottom: 3px solid #1e293b; font-family: monospace; font-weight: 800; font-size: .85rem; }
+
+        /* HUD row */
+        .hud { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; background: rgba(0,0,0,.4); border-radius: 14px; border: 1px solid var(--card-border); padding: .75rem 1.25rem; font-size: .9rem; font-weight: 600; margin-bottom: 1rem; }
+        .hud-i { display: flex; align-items: center; gap: .5rem; }
+        .hp-box { display: flex; gap: 3px; color: var(--hp-ruby); font-size: 1.1rem; }
+        .xp-wrap { display: flex; align-items: center; gap: 6px; }
+        .xp-bar { width: 90px; height: 10px; background: rgba(255,255,255,.05); border-radius: 5px; overflow: hidden; border: 1px solid var(--card-border); }
+        .xp-fill { height: 100%; width: 0%; background: var(--plasma-purple); transition: width .3s ease; }
+
+        /* Question banner */
+        .q-banner { background: rgba(6,182,212,.04); border: 1px solid rgba(6,182,212,.25); border-radius: 16px; padding: 1.25rem 1.5rem; text-align: center; margin-bottom: 1rem; }
+        .q-pill { font-family: var(--font-sci); font-size: .72rem; font-weight: 800; letter-spacing: .05em; color: var(--laser-cyan); border: 1px solid var(--laser-cyan); background: rgba(6,182,212,.08); padding: .2rem .75rem; border-radius: 30px; display: inline-block; margin-bottom: .5rem; text-transform: uppercase; }
+        .q-text { font-size: 1.3rem; font-weight: 700; line-height: 1.45; }
+
+        /* Canvas */
+        .canvas-wrap { width: 100%; background: #02000f; border: 2px solid var(--card-border); border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,.8); margin-bottom: 1rem; }
+        #game-canvas { display: block; width: 100%; height: 440px; cursor: none; }
+
+        /* Legend grid */
+        .legend { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; margin-bottom: 1rem; }
+        @media(max-width:640px) { .legend { grid-template-columns: 1fr; } }
+        .leg-item { display: flex; gap: .6rem; align-items: flex-start; padding: .7rem .9rem; background: rgba(255,255,255,.02); border-radius: 10px; border: 1px solid rgba(255,255,255,.06); font-size: .92rem; line-height: 1.4; transition: all .2s ease; }
+        .leg-item:hover { background: rgba(255,255,255,.04); }
+        .leg-letter { font-family: var(--font-sci); font-weight: 900; font-size: 1rem; flex-shrink: 0; min-width: 24px; }
+        .leg-a { color: #a855f7; border-color: rgba(168,85,247,.2); }
+        .leg-b { color: #06b6d4; border-color: rgba(6,182,212,.2); }
+        .leg-c { color: #f59e0b; border-color: rgba(245,158,11,.2); }
+        .leg-d { color: #ec4899; border-color: rgba(236,72,153,.2); }
+
+        /* Math styling */
+        .math-expr { font-family: 'Cambria Math','Times New Roman',serif; font-size: 1.1em; background: rgba(255,255,255,.04); padding: .1rem .3rem; border-radius: 4px; font-style: italic; }
+        .math-block { display: block; text-align: center; margin: .5rem auto; padding: .4rem; font-size: 1.15em; background: rgba(255,255,255,.05); border-radius: 8px; width: fit-content; }
+
+        /* ====== TUTOR POPUP MODAL ====== */
+        .tutor-modal { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(3,0,14,.85); backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 1.5rem; }
+        .tutor-modal.active { display: flex; }
+        .tutor-card {
+            background: linear-gradient(145deg, rgba(20,12,40,.95), rgba(8,4,18,.98));
+            border: 2px solid var(--card-border); border-radius: 24px;
+            max-width: 680px; width: 100%; max-height: 88vh; overflow-y: auto;
+            padding: 2.25rem; box-shadow: 0 30px 60px rgba(0,0,0,.7);
+            animation: popIn .35s cubic-bezier(.34,1.56,.64,1) forwards;
+        }
+        @keyframes popIn { from{transform:scale(.85);opacity:0} to{transform:scale(1);opacity:1} }
+
+        /* Tutor header with avatar */
+        .tutor-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--card-border); }
+        .tutor-avatar {
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; flex-shrink: 0;
+            box-shadow: 0 0 15px rgba(0,0,0,.3);
+        }
+        .tutor-avatar.correct { background: linear-gradient(135deg, #059669, #10b981); color: white; border: 2px solid var(--success-green); }
+        .tutor-avatar.wrong { background: linear-gradient(135deg, #dc2626, #ef4444); color: white; border: 2px solid var(--hp-ruby); }
+        .tutor-name { font-family: var(--font-sci); font-size: 1.05rem; font-weight: 700; letter-spacing: .05em; }
+        .tutor-status { font-size: .85rem; font-weight: 600; margin-top: 2px; }
+        .tutor-status.ok { color: var(--success-green); }
+        .tutor-status.bad { color: var(--hp-ruby); }
+
+        /* Result badge */
+        .result-badge { display: inline-flex; align-items: center; gap: .5rem; padding: .5rem 1.25rem; border-radius: 30px; font-family: var(--font-sci); font-weight: 800; font-size: .9rem; letter-spacing: .08em; margin-bottom: 1.25rem; }
+        .result-badge.correct { background: rgba(16,185,129,.12); border: 1px solid var(--success-green); color: var(--success-green); }
+        .result-badge.wrong { background: rgba(239,68,68,.12); border: 1px solid var(--hp-ruby); color: var(--hp-ruby); }
+
+        /* Q recap */
+        .q-recap { background: rgba(255,255,255,.03); border: 1px solid var(--card-border); border-radius: 14px; padding: 1.25rem; margin-bottom: 1.25rem; }
+        .q-recap-label { font-size: .78rem; font-weight: 700; text-transform: uppercase; color: var(--laser-cyan); margin-bottom: .4rem; letter-spacing: .05em; }
+        .q-recap-text { font-size: 1.1rem; font-weight: 600; line-height: 1.4; }
+
+        /* Answer rows */
+        .ans-row { display: flex; align-items: flex-start; gap: .6rem; padding: .7rem 1rem; border-radius: 10px; margin-bottom: .6rem; font-size: .95rem; }
+        .ans-row.user-wrong { background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.25); }
+        .ans-row.user-correct { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.25); }
+        .ans-row.the-answer { background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.25); }
+        .ans-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+
+        /* Explanation */
+        .tutor-explain { background: rgba(6,182,212,.06); border-left: 4px solid var(--laser-cyan); border-radius: 0 14px 14px 0; padding: 1.25rem; margin: 1rem 0 1.5rem 0; }
+        .tutor-explain h4 { color: var(--laser-cyan); font-weight: 700; margin-bottom: .4rem; display: flex; align-items: center; gap: .4rem; }
+        .tutor-explain .exp-body { font-size: .95rem; line-height: 1.55; }
+
+        .tutor-footer { text-align: right; }
+
+        /* Game over / victory shared */
+        .end-layout { text-align: center; padding: 2rem 1rem; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; }
+        .fail-panel { width: 100%; max-width: 620px; max-height: 220px; overflow-y: auto; background: rgba(0,0,0,.3); border-radius: 12px; border: 1px solid var(--card-border); padding: 1rem; text-align: left; }
+        .fail-item { padding: .75rem; border-bottom: 1px solid rgba(255,255,255,.05); }
+        .fail-item:last-child { border-bottom: none; }
+        .vic-box { background: rgba(0,0,0,.3); border: 1px solid var(--card-border); border-radius: 16px; padding: 1.25rem 2rem; max-width: 440px; width: 100%; text-align: left; display: flex; flex-direction: column; gap: .5rem; }
+        .vic-row { display: flex; justify-content: space-between; font-size: .95rem; }
+        .vic-hl { font-weight: 700; color: var(--laser-cyan); }
+
+        /* Footer */
+        footer { text-align: center; padding: 1.25rem; color: var(--text-muted); font-size: .8rem; border-top: 1px solid var(--card-border); background: rgba(5,1,10,.5); backdrop-filter: blur(10px); z-index: 10; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(6,182,212,.3); border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="amb"><div class="a1"></div><div class="a2"></div></div>
+
+    <header>
+        <div class="logo"><i class="fa-solid fa-shuttle-space"></i><span>Math Defender</span></div>
+        <div class="hdr-btns">
+            <button class="hdr-btn" id="info-btn" title="Giới thiệu dự án (README)"><i class="fa-solid fa-circle-info"></i></button>
+            <button class="hdr-btn" id="sound-toggle" title="Âm thanh"><i class="fa-solid fa-volume-high"></i></button>
+            <button class="hdr-btn" id="theme-toggle" title="Sáng/Tối"><i class="fa-solid fa-moon"></i></button>
+        </div>
+    </header>
+
+    <main>
+        <div class="viewport" id="vp">
+
+            <!-- TITLE -->
+            <div class="view active" id="v-title">
+                <div class="title-layout">
+                    <h2 class="title-h">GALAXY MATH DEFENDER</h2>
+                    <p class="sub-t">Lái phi thuyền tiêu diệt thiên thạch mang đáp án chính xác, bảo vệ dải ngân hà Toán học Lớp 8!</p>
+                    <div class="instr-box">
+                        <div style="font-weight:700;color:var(--laser-cyan);margin-bottom:.25rem;text-transform:uppercase"><i class="fa-solid fa-gamepad"></i> Hướng dẫn chiến đấu</div>
+                        <div class="kr"><span class="kc">← →</span><span>Di chuyển phi thuyền (hoặc di chuột trên Canvas).</span></div>
+                        <div class="kr"><span class="kc">Space</span> / <span class="kc">Click</span><span>Bắn tia laser tiêu diệt mục tiêu.</span></div>
+                        <div style="font-size:.82rem;margin-top:.25rem;font-style:italic">⚠️ Bắn trúng đáp án sai → mất HP. Trợ lí ảo sẽ giải thích ngay lập tức!</div>
+                    </div>
+                    <button class="btn-sf" id="start-btn"><span>Khởi động phi thuyền</span><i class="fa-solid fa-meteor"></i></button>
+                </div>
+            </div>
+
+            <!-- ARENA -->
+            <div class="view" id="v-arena">
+                <div class="hud">
+                    <div class="hud-i"><i class="fa-solid fa-plane-up" style="color:var(--laser-cyan)"></i><span id="hud-lvl">Lv. 1</span></div>
+                    <div class="hud-i"><span>HP:</span><div class="hp-box" id="hp-box"></div></div>
+                    <div class="hud-i"><div class="xp-wrap"><span>XP:</span><div class="xp-bar"><div class="xp-fill" id="xp-fill"></div></div><span id="xp-txt" style="font-size:.75rem;color:var(--text-muted)">0/100</span></div></div>
+                    <div class="hud-i"><i class="fa-solid fa-bullseye" style="color:var(--star-gold)"></i><span id="hud-prog">1/18</span></div>
+                </div>
+                <div class="q-banner">
+                    <span class="q-pill" id="q-pill">TOÁN 8</span>
+                    <div class="q-text" id="q-text">Đang tải...</div>
+                </div>
+                <div class="canvas-wrap"><canvas id="game-canvas"></canvas></div>
+                <div class="legend" id="legend-grid">
+                    <div class="leg-item leg-a"><span class="leg-letter" style="color:#a855f7">A.</span><span id="lg-A">...</span></div>
+                    <div class="leg-item leg-b"><span class="leg-letter" style="color:#06b6d4">B.</span><span id="lg-B">...</span></div>
+                    <div class="leg-item leg-c"><span class="leg-letter" style="color:#f59e0b">C.</span><span id="lg-C">...</span></div>
+                    <div class="leg-item leg-d"><span class="leg-letter" style="color:#ec4899">D.</span><span id="lg-D">...</span></div>
+                </div>
+                <div style="display:flex;justify-content:flex-start">
+                    <button class="hdr-btn" id="quit-btn" style="width:auto;padding:0 1rem;gap:.4rem;color:var(--hp-ruby)"><i class="fa-solid fa-power-off"></i><span>Thoát</span></button>
+                </div>
+            </div>
+
+            <!-- REPAIR (GAME OVER) -->
+            <div class="view" id="v-repair">
+                <div class="end-layout">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size:3.5rem;color:var(--hp-ruby);filter:drop-shadow(0 0 15px rgba(239,68,68,.4))"></i>
+                    <h3 style="font-family:var(--font-sci);font-size:1.7rem;font-weight:800;color:var(--hp-ruby);letter-spacing:.05em">TÀU BỊ PHÁ HỦY</h3>
+                    <p style="color:var(--text-muted);max-width:500px;font-size:.95rem">Phi thuyền hết giáp! Hãy ôn lại các câu trả lời sai dưới đây:</p>
+                    <div class="fail-panel" id="repair-list"></div>
+                    <button class="btn-sf" id="repair-btn" style="border-color:var(--star-gold);color:var(--star-gold);box-shadow:0 0 15px rgba(245,158,11,.25)"><span>Sửa tàu & Thử lại</span><i class="fa-solid fa-screwdriver-wrench"></i></button>
+                </div>
+            </div>
+
+            <!-- VICTORY -->
+            <div class="view" id="v-victory">
+                <div class="end-layout">
+                    <i class="fa-solid fa-trophy" style="font-size:3.5rem;color:var(--star-gold);filter:drop-shadow(0 0 20px rgba(245,158,11,.4))"></i>
+                    <h3 style="font-family:var(--font-sci);font-size:2rem;font-weight:900;color:var(--success-green);text-shadow:0 0 20px rgba(16,185,129,.4);letter-spacing:.08em">BẢO VỆ GALAXY THÀNH CÔNG!</h3>
+                    <p style="color:var(--text-muted);max-width:500px;font-size:.95rem">Xuất sắc! Bạn đã dọn sạch dải ngân hà Toán học Lớp 8!</p>
+                    <div class="vic-box">
+                        <div class="vic-row"><span>Cấp phi thuyền:</span><span class="vic-hl" id="vc-lvl">Lv. 3</span></div>
+                        <div class="vic-row"><span>Bắn trúng:</span><span class="vic-hl" id="vc-score">18/18</span></div>
+                        <div class="vic-row"><span>Bị thương:</span><span class="vic-hl" id="vc-dmg" style="color:var(--hp-ruby)">0</span></div>
+                    </div>
+                    <button class="btn-sf" id="vic-btn"><span>Chiến đấu lượt mới</span><i class="fa-solid fa-rotate-left"></i></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- TUTOR POPUP MODAL -->
+    <div class="tutor-modal" id="tutor-modal">
+        <div class="tutor-card">
+            <div class="tutor-header">
+                <div class="tutor-avatar" id="tutor-av"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <div class="tutor-name">Trợ Lí Toán Học</div>
+                    <div class="tutor-status" id="tutor-sts">Đánh giá kết quả...</div>
+                </div>
+            </div>
+            <div class="result-badge" id="result-badge"><i class="fa-solid fa-circle-check"></i><span id="result-text">CHÍNH XÁC</span></div>
+            <div class="q-recap">
+                <div class="q-recap-label"><i class="fa-solid fa-clipboard-question"></i> Câu hỏi</div>
+                <div class="q-recap-text" id="tutor-q">...</div>
+            </div>
+            <div id="tutor-ans-section">
+                <!-- dynamic answer rows -->
+            </div>
+            <div class="tutor-explain">
+                <h4><i class="fa-solid fa-lightbulb"></i> Phân Tích Từ Trợ Lí:</h4>
+                <div class="exp-body" id="tutor-exp">...</div>
+            </div>
+            <div class="tutor-footer">
+                <button class="btn-sf" id="tutor-next-btn"><span>Tiếp tục chiến đấu</span><i class="fa-solid fa-bolt"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INFO/README MODAL -->
+    <div class="tutor-modal" id="info-modal">
+        <div class="tutor-card" style="max-width:760px;">
+            <div class="tutor-header">
+                <div class="tutor-avatar correct" style="background:linear-gradient(135deg,#06b6d4,#a855f7);border-color:var(--laser-cyan)"><i class="fa-solid fa-circle-info"></i></div>
+                <div>
+                    <div class="tutor-name" style="color:var(--laser-cyan)">Giới Thiệu Dự Án (README)</div>
+                    <div class="tutor-status ok" style="color:var(--text-muted)">Thông tin chi tiết hệ sinh thái Math Universe 8</div>
+                </div>
+            </div>
+            <div style="font-size:.95rem;line-height:1.6;display:flex;flex-direction:column;gap:1.2rem;max-height:55vh;overflow-y:auto;padding-right:8px;">
+                <h3 style="font-family:var(--font-sci);color:var(--laser-cyan);font-size:1.3rem;">🌌 Math Universe 8: Vừa Học Vừa Chơi Toán Lớp 8</h3>
+                <p>Hệ sinh thái học tập và ôn tập môn Toán Lớp 8 kết hợp phương pháp Game hóa (Gamification) độc đáo. Dự án này được thiết kế nhằm giúp học sinh ôn thi giữa kì 1 và chuẩn bị thuyết trình môn Toán một cách trực quan, hứng thú.</p>
+                
+                <hr style="border:0;border-top:1px solid var(--card-border);">
+                
+                <h4 style="color:var(--plasma-purple);font-family:var(--font-sci);"><i class="fa-solid fa-gamepad"></i> Các Trải Nghiệm Học Tập Tương Tác:</h4>
+                <ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.5rem;">
+                    <li>🚀 <b>Galaxy Math Defender (Math_Shooter.html):</b> Bắn súng không gian 2D cổ điển. Tiêu diệt thiên thạch mang đáp án chính xác để bảo vệ dải ngân hà Toán 8.</li>
+                    <li>⛰️ <b>Math Quest (Math_Quest.html):</b> Vượt qua các trạm thử thách Toán học trên đường chinh phục đỉnh núi Olympus huyền thoại.</li>
+                    <li>📝 <b>Chuyên Gia Khảo Thí (Math_Quiz.html):</b> Hệ thống thi thử trắc nghiệm Toán 8 đa chế độ, tích hợp Trợ lý ảo giải thích chi tiết từng bước.</li>
+                </ul>
+                
+                <hr style="border:0;border-top:1px solid var(--card-border);">
+                
+                <h4 style="color:var(--star-gold);font-family:var(--font-sci);"><i class="fa-solid fa-folder-open"></i> Sổ Tay Quản Lý Dự Án (Obsidian):</h4>
+                <ul style="padding-left:1.5rem;display:flex;flex-direction:column;gap:.5rem;">
+                    <li>📋 <b>ON THI GIUA KI 1 TOAN.md:</b> Bản kế hoạch phân bổ thời gian hàng tuần để ôn lý thuyết và làm đề minh họa.</li>
+                    <li>📢 <b>THUYET TRINH TOAN.md:</b> Dàn ý chi tiết cho bài thuyết trình nhóm về "Ứng dụng định lý Pythagore trong thực tế".</li>
+                </ul>
+                
+                <hr style="border:0;border-top:1px solid var(--card-border);">
+                
+                <h4 style="color:var(--success-green);font-family:var(--font-sci);"><i class="fa-solid fa-code"></i> Công Nghệ Sử Dụng:</h4>
+                <p>Dự án được xây dựng 100% bằng các công nghệ frontend thuần: <b>HTML5</b>, <b>CSS3</b>, và <b>JavaScript thuần (Canvas API)</b> chạy trực tiếp trên trình duyệt, hoàn toàn offline.</p>
+            </div>
+            <div class="tutor-footer" style="margin-top:1.5rem;border-top:1px solid var(--card-border);padding-top:1rem;">
+                <button class="btn-sf" id="info-close-btn"><span>Đóng</span><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Thiết kế bởi <strong>Chuyên gia Khảo thí Toán 8</strong></p>
+        <p style="margin-top:4px;font-size:.72rem;color:var(--text-muted)">Đọc kỹ đáp án trên bảng A B C D → Nhắm bắn thiên thạch đúng màu trên Canvas!</p>
+    </footer>
+
+    <script>
+    // ===== SOUND ENGINE =====
+    class SFX {
+        constructor(){ this.ctx=null; this.on=true; }
+        init(){ if(!this.ctx) this.ctx=new(window.AudioContext||window.webkitAudioContext)(); }
+        tone(f,d,t,type='sine',v=.15){ try{ const o=this.ctx.createOscillator(),g=this.ctx.createGain(); o.type=type; o.frequency.setValueAtTime(f,t); g.gain.setValueAtTime(v,t); g.gain.exponentialRampToValueAtTime(.001,t+d); o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t+d); }catch(e){} }
+        laser(){ if(!this.on)return; this.init(); const t=this.ctx.currentTime; const o=this.ctx.createOscillator(),g=this.ctx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(400,t); o.frequency.exponentialRampToValueAtTime(1000,t+.12); g.gain.setValueAtTime(.12,t); g.gain.exponentialRampToValueAtTime(.001,t+.12); o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t+.12); }
+        boom(){ if(!this.on)return; this.init(); const t=this.ctx.currentTime; const o=this.ctx.createOscillator(),g=this.ctx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(220,t); o.frequency.linearRampToValueAtTime(40,t+.25); g.gain.setValueAtTime(.25,t); g.gain.exponentialRampToValueAtTime(.001,t+.25); o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t+.25); }
+        hit(){ if(!this.on)return; this.init(); const t=this.ctx.currentTime; const o=this.ctx.createOscillator(),g=this.ctx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(120,t); o.frequency.setValueAtTime(100,t+.1); g.gain.setValueAtTime(.2,t); g.gain.exponentialRampToValueAtTime(.001,t+.2); o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t+.2); }
+        lvlUp(){ if(!this.on)return; this.init(); const t=this.ctx.currentTime; [523.25,659.25,783.99,1046.50].forEach((f,i)=>this.tone(f,.15,t+i*.08,'sine',.15)); }
+        click(){ if(!this.on)return; this.init(); this.tone(700,.03,this.ctx.currentTime,'sine',.1); }
+    }
+    const sfx=new SFX();
+
+    // ===== QUESTION BANK (42 câu — 7 câu mỗi chủ đề) =====
+    const TOPICS=["7 Hằng đẳng thức","Hệ thức Vi-ét","Các loại Tứ giác","Thales & Đường trung bình","Phân tích đa thức","Định lý Pythagore"];
+    const QUESTION_BANK=[
+        // ===== T0: 7 Hằng đẳng thức (7 câu) =====
+        {t:0,q:"Khai triển <span class='math-expr'>(x + 3)<sup>2</sup></span> ta được:",o:["x² + 3x + 9","x² + 6x + 9","x² + 9","x² - 6x + 9"],c:1,e:"Áp dụng HĐT số 1: <span class='math-expr'>(A+B)² = A²+2AB+B²</span>.<br>Với A=x, B=3: <span class='math-block'>(x+3)² = x²+6x+9</span>"},
+        {t:0,q:"Đâu là khai triển của <span class='math-expr'>(A - B)<sup>3</sup></span>?",o:["A³ - B³","A³ - 3A²B + 3AB² - B³","A³ + 3A²B + 3AB² + B³","(A-B)(A²+AB+B²)"],c:1,e:"Lập phương một hiệu có dấu đan xen (+−+−):<br><span class='math-block'>(A-B)³ = A³ - 3A²B + 3AB² - B³</span>"},
+        {t:0,q:"Điền vào: <span class='math-expr'>A³ - B³ = (A - B)( ? )</span>",o:["A²+2AB+B²","A²-AB+B²","A²+AB+B²","A²-2AB+B²"],c:2,e:"Hiệu hai lập phương: <span class='math-expr'>A³-B³ = (A-B)(A²+AB+B²)</span>.<br>Ngoặc thứ hai là bình phương thiếu của một tổng."},
+        {t:0,q:"Khai triển <span class='math-expr'>(2a - 5)<sup>2</sup></span> ta được:",o:["4a² - 10a + 25","4a² + 20a + 25","4a² - 20a + 25","2a² - 20a + 25"],c:2,e:"Áp dụng HĐT số 2: (A-B)² = A²-2AB+B².<br>A=2a, B=5: (2a)²-2·2a·5+5² = 4a²-20a+25."},
+        {t:0,q:"Phân tích <span class='math-expr'>x² - 9</span> bằng hằng đẳng thức:",o:["(x-3)²","(x+3)²","(x-3)(x+3)","(x-9)(x+1)"],c:2,e:"Hiệu hai bình phương: A²-B² = (A-B)(A+B).<br>x²-9 = x²-3² = (x-3)(x+3)."},
+        {t:0,q:"Khai triển <span class='math-expr'>(A + B)<sup>3</sup></span> là:",o:["A³ + B³","A³ + 3A²B + 3AB² + B³","A³ - 3A²B + 3AB² - B³","(A+B)(A²-AB+B²)"],c:1,e:"Lập phương một tổng: <span class='math-block'>(A+B)³ = A³+3A²B+3AB²+B³</span>"},
+        {t:0,q:"Phân tích <span class='math-expr'>A³ + B³</span> thành nhân tử:",o:["(A+B)(A²+AB+B²)","(A+B)(A²-AB+B²)","(A-B)(A²+AB+B²)","(A+B)³"],c:1,e:"Tổng hai lập phương: A³+B³ = (A+B)(A²-AB+B²).<br>Ngoặc thứ hai là bình phương thiếu của một hiệu."},
+
+        // ===== T1: Hệ thức Vi-ét (7 câu) =====
+        {t:1,q:"Hệ thức Vi-ét: Tổng S và tích P hai nghiệm pt bậc hai là:",o:["S=-b/a, P=c/a","S=b/a, P=-c/a","S=-b/a, P=-c/a","S=b/a, P=c/a"],c:0,e:"Theo Vi-ét: <span class='math-block'>S = x₁+x₂ = -b/a</span><span class='math-block'>P = x₁·x₂ = c/a</span>"},
+        {t:1,q:"Nhẩm nghiệm <span class='math-expr'>x² - 5x + 4 = 0</span> bằng Vi-ét:",o:["x₁=1, x₂=-4","x₁=-1, x₂=-4","x₁=1, x₂=4","x₁=-1, x₂=4"],c:2,e:"Hệ số a=1, b=-5, c=4. Tổng a+b+c = 0.<br>⇒ x₁=1, x₂=c/a=4."},
+        {t:1,q:"Nếu <span class='math-expr'>a - b + c = 0</span>, hai nghiệm là:",o:["x₁=1, x₂=c/a","x₁=-1, x₂=-c/a","x₁=-1, x₂=c/a","x₁=1, x₂=-c/a"],c:1,e:"Quy tắc nhẩm nhanh số hai: Khi a-b+c=0 thì x₁=-1, x₂=-c/a."},
+        {t:1,q:"Nhẩm nghiệm <span class='math-expr'>2x² + 3x + 1 = 0</span>:",o:["x₁=-1, x₂=-1/2","x₁=1, x₂=1/2","x₁=-1, x₂=1/2","x₁=1, x₂=-1/2"],c:0,e:"a=2, b=3, c=1. a+b+c=6≠0 nhưng a-b+c=2-3+1=0.<br>⇒ x₁=-1, x₂=-c/a=-1/2."},
+        {t:1,q:"Pt <span class='math-expr'>x² - 7x + 12 = 0</span>. Tổng hai nghiệm bằng:",o:["7","-7","12","-12"],c:0,e:"Vi-ét: S = -b/a = -(-7)/1 = 7."},
+        {t:1,q:"Pt <span class='math-expr'>x² + 2x - 3 = 0</span>. Tích hai nghiệm bằng:",o:["2","-2","3","-3"],c:3,e:"Vi-ét: P = c/a = -3/1 = -3."},
+        {t:1,q:"Biết x₁+x₂=5, x₁·x₂=6. Pt bậc hai tương ứng là:",o:["x²-5x+6=0","x²+5x+6=0","x²-5x-6=0","x²+5x-6=0"],c:0,e:"Pt có nghiệm x₁,x₂ viết dạng: x²-Sx+P=0 ⇒ x²-5x+6=0."},
+
+        // ===== T2: Các loại Tứ giác (7 câu) =====
+        {t:2,q:"Cách phổ biến nhất chứng minh tứ giác là hình bình hành?",o:["Có hai đường chéo bằng nhau.","Có hai đường chéo vuông góc.","Có các cạnh kề bằng nhau.","Có một cặp cạnh đối song song và bằng nhau."],c:3,e:"Dấu hiệu <i>một cặp cạnh đối vừa song song vừa bằng nhau</i> là cách tiện lợi nhất."},
+        {t:2,q:"Hình bình hành trở thành hình chữ nhật nếu có thêm:",o:["2 cạnh kề bằng nhau.","2 đường chéo bằng nhau (hoặc 1 góc vuông).","2 đường chéo vuông góc.","4 cạnh bằng nhau."],c:1,e:"HBH có 1 góc vuông hoặc 2 đường chéo bằng nhau ⇒ Hình chữ nhật."},
+        {t:2,q:"Hình thoi trở thành hình vuông khi có thêm:",o:["2 đường chéo vuông góc.","2 cạnh kề bằng nhau.","1 góc vuông hoặc 2 đường chéo bằng nhau.","Các cạnh đối song song."],c:2,e:"Hình thoi đã có 4 cạnh bằng nhau, 2 đường chéo vuông góc. Thêm 1 góc vuông hoặc 2 đường chéo bằng nhau ⇒ Hình vuông."},
+        {t:2,q:"Sơ đồ phát triển tứ giác đúng là:",o:["Tứ giác → HBH → Hình thoi → Hình vuông","Tứ giác → Hình thang → HBH → HCN/Hình thoi → Hình vuông","Tứ giác → HCN → Hình thoi → Hình vuông","Hình thang → Tứ giác → HBH → Hình vuông"],c:1,e:"Sơ đồ: Tứ giác → Hình thang → HBH → HCN / Hình thoi → Hình vuông."},
+        {t:2,q:"Tứ giác có 4 cạnh bằng nhau nhưng KHÔNG có góc vuông là:",o:["Hình vuông","Hình chữ nhật","Hình thoi","Hình bình hành"],c:2,e:"Hình thoi có 4 cạnh bằng nhau. Nếu thêm 1 góc vuông thì thành hình vuông."},
+        {t:2,q:"Hình bình hành có tính chất nào sau đây?",o:["Hai đường chéo bằng nhau.","Hai đường chéo vuông góc.","Hai đường chéo cắt nhau tại trung điểm mỗi đường.","Bốn cạnh bằng nhau."],c:2,e:"Tính chất quan trọng nhất của HBH: hai đường chéo cắt nhau tại trung điểm mỗi đường."},
+        {t:2,q:"Hình chữ nhật trở thành hình vuông khi có thêm:",o:["2 đường chéo bằng nhau.","2 cạnh kề bằng nhau hoặc 2 đường chéo vuông góc.","1 góc vuông.","Các cạnh đối song song."],c:1,e:"HCN đã có 4 góc vuông, 2 đường chéo bằng nhau. Thêm 2 cạnh kề bằng nhau hoặc 2 đường chéo vuông góc ⇒ Hình vuông."},
+
+        // ===== T3: Thales & Đường trung bình (7 câu) =====
+        {t:3,q:"Cho △ABC có MN // BC. Tỉ số Thales đúng là:",o:["AM/MB = AN/NC","AM/AB = NC/AN","AM/MB = NC/AN","MB/AB = AN/AC"],c:0,e:"Theo Thales, đường thẳng song song cắt 2 cạnh cho ra đoạn thẳng tỉ lệ: AM/MB = AN/NC."},
+        {t:3,q:"Tính chất đường trung bình tam giác:",o:["Vuông góc và bằng nửa cạnh thứ ba.","Song song và bằng nửa cạnh thứ ba.","Nối đỉnh tới trung điểm cạnh đáy.","Song song và bằng cạnh thứ ba."],c:1,e:"Đường trung bình nối trung điểm 2 cạnh, song song với cạnh thứ 3 và bằng nửa cạnh ấy."},
+        {t:3,q:"△ABC có BC=12cm. D,E là trung điểm AB,AC. DE = ?",o:["24 cm","8 cm","6 cm","4 cm"],c:2,e:"DE là đường trung bình ⇒ DE = BC/2 = 12/2 = 6 cm."},
+        {t:3,q:"Định lý Thales đảo dùng để chứng minh điều gì?",o:["Hai đoạn thẳng bằng nhau.","Hai tam giác đồng dạng.","Hai đường thẳng song song.","Hai góc bằng nhau."],c:2,e:"Thales đảo: nếu đường thẳng cắt 2 cạnh tam giác tạo đoạn tỉ lệ ⇒ song song cạnh còn lại."},
+        {t:3,q:"△ABC, M∈AB sao cho AM/AB = 2/5. MN // BC, BC=15cm. MN = ?",o:["6 cm","7.5 cm","10 cm","3 cm"],c:0,e:"Theo Thales: MN/BC = AM/AB = 2/5 ⇒ MN = BC×2/5 = 15×2/5 = 6 cm."},
+        {t:3,q:"Đường trung bình của tam giác nối:",o:["Một đỉnh với trung điểm cạnh đối.","Trung điểm của hai cạnh.","Hai đỉnh của tam giác.","Trọng tâm với đỉnh."],c:1,e:"Đường trung bình nối trung điểm hai cạnh của tam giác."},
+        {t:3,q:"△ABC có DE là đường trung bình ứng BC. Nếu DE=7cm thì BC=?",o:["3.5 cm","7 cm","14 cm","21 cm"],c:2,e:"DE = BC/2 ⇒ BC = 2×DE = 2×7 = 14 cm."},
+
+        // ===== T4: Phân tích đa thức thành nhân tử (7 câu) =====
+        {t:4,q:"Phân tích <span class='math-expr'>3x² - 6x</span> thành nhân tử:",o:["3(x² - 2x)","3x(x - 2)","3x(x + 2)","x(3x - 6)"],c:1,e:"Đặt nhân tử chung 3x: 3x²-6x = 3x(x-2)."},
+        {t:4,q:"Phân tích <span class='math-expr'>xy + 3y + 2x + 6</span> bằng nhóm:",o:["(x+3)(y+2)","(x-3)(y+2)","(x+3)(y-2)","(x-3)(y-2)"],c:0,e:"Nhóm: (xy+3y)+(2x+6) = y(x+3)+2(x+3) = (x+3)(y+2)."},
+        {t:4,q:"Phép biến đổi nào <b>SAI</b> về dấu khi nhóm hạng tử?",o:["-x-y = -(x+y)","-x+y = -(x-y)","-x+y = -(x+y)","x-y = -(-x+y)"],c:2,e:"Sai vì -(x+y) = -x-y chứ không phải -x+y. Đúng phải là: -x+y = -(x-y)."},
+        {t:4,q:"Phân tích <span class='math-expr'>x² - 4x + 4</span>:",o:["(x-2)(x+2)","(x+2)²","(x-2)²","(x-4)²"],c:2,e:"Nhận dạng HĐT số 2: x²-4x+4 = x²-2·x·2+2² = (x-2)²."},
+        {t:4,q:"Phân tích <span class='math-expr'>4x² - 25</span>:",o:["(2x-5)²","(2x+5)²","(2x-5)(2x+5)","(4x-5)(x+5)"],c:2,e:"Hiệu hai bình phương: 4x²-25 = (2x)²-5² = (2x-5)(2x+5)."},
+        {t:4,q:"Phân tích <span class='math-expr'>2x³ + 4x² + 2x</span>:",o:["2x(x+1)²","2x(x²+2x+1)","2(x³+2x²+x)","Cả A và B đều đúng"],c:3,e:"Đặt 2x ra: 2x(x²+2x+1). Nhận dạng HĐT: 2x(x+1)². Cả hai cách viết đều đúng."},
+        {t:4,q:"Thứ tự ưu tiên phương pháp phân tích nhân tử:",o:["Nhóm → HĐT → Đặt NTC","HĐT → Nhóm → Đặt NTC","Đặt NTC → HĐT → Nhóm","Đặt NTC → Nhóm → HĐT"],c:2,e:"Luôn ưu tiên: Đặt nhân tử chung trước → Dùng hằng đẳng thức → Nhóm hạng tử."},
+
+        // ===== T5: Định lý Pythagore (7 câu) =====
+        {t:5,q:"△ABC vuông tại A. Hệ thức Pythagore đúng là:",o:["AB²+BC²=AC²","AB²+AC²=BC²","AC²+BC²=AB²","AB+AC=BC"],c:1,e:"Cạnh huyền BC đối diện góc vuông A: AB²+AC²=BC²."},
+        {t:5,q:"Bộ ba nào <b>KHÔNG</b> phải bộ ba Pythagore?",o:["3, 4, 5","6, 8, 10","5, 12, 13","4, 5, 6"],c:3,e:"4²+5²=41 ≠ 6²=36. Bộ 4-5-6 không tạo tam giác vuông."},
+        {t:5,q:"△ABC vuông tại A, AB=6cm, AC=8cm. BC = ?",o:["7 cm","10 cm","14 cm","100 cm"],c:1,e:"BC²=6²+8²=36+64=100 ⇒ BC=√100=10 cm."},
+        {t:5,q:"△ABC vuông tại B, AB=5cm, BC=12cm. AC = ?",o:["17 cm","7 cm","13 cm","169 cm"],c:2,e:"AC²=AB²+BC²=25+144=169 ⇒ AC=√169=13 cm."},
+        {t:5,q:"Tam giác có cạnh 8, 15, 17 có phải vuông không?",o:["Không, vì 8+15≠17","Có, vuông tại cạnh 17","Có, vuông tại cạnh đối diện cạnh 17","Không xác định được"],c:2,e:"8²+15²=64+225=289=17². Thỏa mãn Pythagore ⇒ vuông tại đỉnh đối diện cạnh 17."},
+        {t:5,q:"Bội số nào của bộ (3,4,5) cũng là bộ ba Pythagore?",o:["Đúng, mọi bội đều là bộ Pythagore.","Sai, chỉ bội chẵn mới đúng.","Sai, chỉ đúng với bội ≤10.","Tùy trường hợp."],c:0,e:"Nếu (a,b,c) là bộ Pythagore thì (ka,kb,kc) cũng là bộ Pythagore vì (ka)²+(kb)²=(kc)²."},
+        {t:5,q:"△ABC vuông tại C, AC=9cm, BC=12cm. AB = ?",o:["21 cm","15 cm","225 cm","10.5 cm"],c:1,e:"AB²=AC²+BC²=81+144=225 ⇒ AB=√225=15 cm. (Bộ 9-12-15 = 3×(3-4-5))"}
+    ];
+
+    const QUESTIONS_PER_SESSION = 18; // Mỗi ván chọn 18 câu ngẫu nhiên
+
+    // ===== SHUFFLE UTILITIES =====
+    function fisherYatesShuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // Shuffle options ABCD cho mỗi câu, cập nhật lại index đáp án đúng
+    function shuffleOptions(q) {
+        const indices = [0, 1, 2, 3];
+        const shuffled = fisherYatesShuffle(indices);
+        const newOpts = shuffled.map(i => q.o[i]);
+        const newCorrect = shuffled.indexOf(q.c);
+        return { ...q, o: newOpts, c: newCorrect };
+    }
+
+    // Chuẩn bị bộ câu hỏi cho 1 ván: chọn ngẫu nhiên + shuffle ABCD
+    function prepareSession() {
+        // Lấy đều từ mỗi chủ đề (3 câu/topic × 6 = 18)
+        const byTopic = {};
+        QUESTION_BANK.forEach(q => {
+            if (!byTopic[q.t]) byTopic[q.t] = [];
+            byTopic[q.t].push(q);
+        });
+        let picked = [];
+        const perTopic = Math.floor(QUESTIONS_PER_SESSION / TOPICS.length); // 3
+        for (const t in byTopic) {
+            const shuffledTopic = fisherYatesShuffle(byTopic[t]);
+            picked.push(...shuffledTopic.slice(0, perTopic));
+        }
+        // Nếu cần thêm câu (18 - 6*3 = 0), lấy random từ câu còn lại
+        const remaining = QUESTION_BANK.filter(q => !picked.includes(q));
+        const extra = QUESTIONS_PER_SESSION - picked.length;
+        if (extra > 0) {
+            picked.push(...fisherYatesShuffle(remaining).slice(0, extra));
+        }
+        // Shuffle thứ tự tổng thể + shuffle ABCD từng câu
+        sessionQs = fisherYatesShuffle(picked).map(q => shuffleOptions(q));
+    }
+
+    // ===== STATE =====
+    let sessionQs = []; // Bộ câu hỏi đã shuffle cho ván hiện tại
+    let qIdx=0, hp=3, maxHp=3, score=0, xp=0, lvl=1, paused=false, fails=[];
+
+    // ===== DOM =====
+    const $=id=>document.getElementById(id);
+    const vTitle=$('v-title'), vArena=$('v-arena'), vRepair=$('v-repair'), vVictory=$('v-victory');
+    const hpBox=$('hp-box'), xpFill=$('xp-fill'), xpTxt=$('xp-txt'), hudLvl=$('hud-lvl'), hudProg=$('hud-prog');
+    const qPill=$('q-pill'), qText=$('q-text');
+    const lgA=$('lg-A'), lgB=$('lg-B'), lgC=$('lg-C'), lgD=$('lg-D');
+    const tutorModal=$('tutor-modal'), tutorAv=$('tutor-av'), tutorSts=$('tutor-sts');
+    const resBadge=$('result-badge'), resTxt=$('result-text'), tutorQ=$('tutor-q');
+    const tutorAns=$('tutor-ans-section'), tutorExp=$('tutor-exp'), tutorNextBtn=$('tutor-next-btn');
+
+    // ===== CANVAS =====
+    const canvas=$('game-canvas'), ctx=canvas.getContext('2d');
+    let ship={x:0,y:0,w:38,h:32}, lasers=[], asteroids=[], stars=[], particles=[];
+
+    function initCanvas(){
+        canvas.width=canvas.offsetWidth;
+        canvas.height=canvas.offsetHeight;
+        ship.y=canvas.height-44;
+        if(ship.x===0) ship.x=canvas.width/2;
+    }
+    function initStars(){
+        stars=[];
+        for(let i=0;i<90;i++) stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,s:Math.random()*2.5,sp:Math.random()*1.5+.5});
+    }
+
+    // Particle
+    class P{
+        constructor(x,y,c){this.x=x;this.y=y;this.s=Math.random()*5+2;this.c=c;this.vx=Math.random()*7-3.5;this.vy=Math.random()*7-3.5;this.a=1;this.d=Math.random()*.03+.015;}
+        upd(){this.x+=this.vx;this.y+=this.vy;this.a-=this.d;}
+        draw(){ctx.save();ctx.globalAlpha=this.a;ctx.fillStyle=this.c;ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fill();ctx.restore();}
+    }
+    function explode(x,y,c='#06b6d4'){for(let i=0;i<30;i++) particles.push(new P(x,y,c));}
+
+    // Draw ship
+    function drawShip(){
+        ctx.save();
+        ctx.shadowBlur=12; ctx.shadowColor='#06b6d4';
+        ctx.strokeStyle='#06b6d4'; ctx.lineWidth=2.5; ctx.fillStyle='rgba(6,182,212,.3)';
+        ctx.beginPath();
+        ctx.moveTo(ship.x,ship.y);
+        ctx.lineTo(ship.x-ship.w/2,ship.y+ship.h);
+        ctx.lineTo(ship.x+ship.w/2,ship.y+ship.h);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        // thruster
+        if(Math.random()>.3){
+            ctx.shadowColor='#f97316'; ctx.strokeStyle='#f97316'; ctx.fillStyle='#ea580c';
+            ctx.beginPath();
+            ctx.moveTo(ship.x-7,ship.y+ship.h);
+            ctx.lineTo(ship.x,ship.y+ship.h+(Math.random()*14+7));
+            ctx.lineTo(ship.x+7,ship.y+ship.h);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    // Draw lasers
+    function drawLasers(){
+        ctx.save(); ctx.strokeStyle='#22c55e'; ctx.lineWidth=3.5; ctx.shadowBlur=10; ctx.shadowColor='#22c55e';
+        lasers.forEach(l=>{ctx.beginPath();ctx.moveTo(l.x,l.y);ctx.lineTo(l.x,l.y-14);ctx.stroke();});
+        ctx.restore();
+    }
+    function updLasers(){lasers.forEach(l=>l.y-=10);lasers=lasers.filter(l=>l.y>0);}
+
+    // Draw asteroids
+    function drawAsteroids(){
+        asteroids.forEach(a=>{
+            ctx.save();
+            ctx.shadowBlur=14; ctx.shadowColor=a.col;
+            ctx.fillStyle='rgba(10,5,20,.85)'; ctx.strokeStyle=a.col; ctx.lineWidth=2.5;
+            ctx.beginPath();
+            const r=a.r;
+            for(let i=0;i<8;i++){const ang=(i*Math.PI)/4; const rm=1+(Math.sin(ang*3+a.i)*.08); const rx=a.x+Math.cos(ang)*r*rm; const ry=a.y+Math.sin(ang)*r*rm; i===0?ctx.moveTo(rx,ry):ctx.lineTo(rx,ry);}
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            // Letter
+            ctx.shadowBlur=0; ctx.fillStyle='white';
+            ctx.font=`bold 16px Orbitron,sans-serif`;
+            ctx.textAlign='center'; ctx.textBaseline='middle';
+            ctx.fillText(a.l,a.x,a.y);
+            ctx.restore();
+        });
+    }
+    function updAsteroids(){
+        asteroids.forEach(a=>{a.x+=a.vx; if(a.x<a.r+15||a.x>canvas.width-a.r-15) a.vx*=-1;});
+        // collision avoidance
+        for(let i=0;i<asteroids.length;i++){
+            for(let j=i+1;j<asteroids.length;j++){
+                const a1=asteroids[i],a2=asteroids[j];
+                const dx=a2.x-a1.x,dy=a2.y-a1.y,d=Math.hypot(dx,dy),md=a1.r+a2.r+20;
+                if(d<md){const t=a1.vx;a1.vx=a2.vx;a2.vx=t;const o=md-d;const n=d>0?dx/d:1;a1.x-=n*o*.5;a2.x+=n*o*.5;}
+            }
+        }
+    }
+
+    // Draw stars
+    function drawStars(){
+        ctx.fillStyle='white';
+        stars.forEach(s=>{ctx.globalAlpha=s.sp/2;ctx.fillRect(s.x,s.y,s.s,s.s);ctx.globalAlpha=1;});
+    }
+    function updStars(){stars.forEach(s=>{s.y+=s.sp;if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width;}});}
+
+    // Collision
+    function checkHits(){
+        for(let li=lasers.length-1;li>=0;li--){
+            const ls=lasers[li];
+            for(let ai=0;ai<asteroids.length;ai++){
+                const a=asteroids[ai];
+                if(Math.hypot(ls.x-a.x,ls.y-a.y)<a.r+6){
+                    lasers.splice(li,1);
+                    onHit(a);
+                    return;
+                }
+            }
+        }
+    }
+
+    // ===== HIT HANDLER (shows tutor popup for BOTH correct & wrong) =====
+    let pendingAction=null; // 'next' or 'gameover' or 'victory'
+
+    function onHit(ast){
+        paused=true;
+        const q=sessionQs[qIdx];
+        const ok=(ast.i===q.c);
+        const letters=['A','B','C','D'];
+
+        explode(ast.x,ast.y,ast.col);
+
+        if(ok){
+            sfx.boom(); score++;
+            xp+=35; checkLvlUp();
+        } else {
+            sfx.hit(); hp--; renderHP();
+            fails.push({qText:q.q,wrong:letters[ast.i]+'. '+q.o[ast.i],right:letters[q.c]+'. '+q.o[q.c],exp:q.e});
+        }
+
+        // Show tutor popup after short delay for explosion to play
+        setTimeout(()=>showTutor(q,ast.i,ok),450);
+    }
+
+    function showTutor(q,selIdx,ok){
+        const letters=['A','B','C','D'];
+        // Avatar
+        tutorAv.className='tutor-avatar '+(ok?'correct':'wrong');
+        tutorAv.innerHTML=ok?'<i class="fa-solid fa-robot"></i>':'<i class="fa-solid fa-user-astronaut"></i>';
+        tutorSts.className='tutor-status '+(ok?'ok':'bad');
+        tutorSts.textContent=ok?'Chúc mừng phi hành gia!':'Cần sửa chữa lỗi kỹ thuật!';
+
+        // Badge
+        resBadge.className='result-badge '+(ok?'correct':'wrong');
+        resBadge.querySelector('i').className=ok?'fa-solid fa-circle-check':'fa-solid fa-circle-xmark';
+        resTxt.textContent=ok?'CHÍNH XÁC! +35 XP':'SAI RỒI! -1 HP';
+
+        // Question recap
+        tutorQ.innerHTML=q.q;
+
+        // Answer section
+        tutorAns.innerHTML='';
+        if(ok){
+            const row=document.createElement('div');
+            row.className='ans-row user-correct';
+            row.innerHTML=`<span class="ans-icon" style="color:var(--success-green)"><i class="fa-solid fa-circle-check"></i></span><span><b>Bạn đã bắn đúng:</b> ${letters[selIdx]}. ${q.o[selIdx]}</span>`;
+            tutorAns.appendChild(row);
+        } else {
+            const r1=document.createElement('div');
+            r1.className='ans-row user-wrong';
+            r1.innerHTML=`<span class="ans-icon" style="color:var(--hp-ruby)"><i class="fa-solid fa-circle-xmark"></i></span><span><b>Bạn đã bắn nhầm:</b> ${letters[selIdx]}. ${q.o[selIdx]}</span>`;
+            tutorAns.appendChild(r1);
+            const r2=document.createElement('div');
+            r2.className='ans-row the-answer';
+            r2.innerHTML=`<span class="ans-icon" style="color:var(--success-green)"><i class="fa-solid fa-circle-check"></i></span><span><b>Đáp án đúng:</b> ${letters[q.c]}. ${q.o[q.c]}</span>`;
+            tutorAns.appendChild(r2);
+        }
+
+        // Explanation
+        tutorExp.innerHTML=q.e;
+
+        // Determine what happens when user clicks "next"
+        if(hp<=0 && !ok){
+            pendingAction='gameover';
+            tutorNextBtn.querySelector('span').textContent='Xem kết quả';
+        } else {
+            qIdx++;
+            if(qIdx>=sessionQs.length){
+                pendingAction='victory';
+                tutorNextBtn.querySelector('span').textContent='Xem kết quả';
+            } else {
+                pendingAction='next';
+                tutorNextBtn.querySelector('span').textContent='Tiếp tục chiến đấu';
+            }
+        }
+
+        tutorModal.classList.add('active');
+    }
+
+    tutorNextBtn.addEventListener('click',()=>{
+        sfx.click();
+        tutorModal.classList.remove('active');
+        if(pendingAction==='gameover') triggerGameOver();
+        else if(pendingAction==='victory') triggerVictory();
+        else { loadQuestion(); paused=false; }
+    });
+
+    function checkLvlUp(){
+        const need=lvl*100;
+        if(xp>=need){xp-=need;lvl++;sfx.lvlUp();if(hp<maxHp){hp++;renderHP();}}
+        updHUD();
+    }
+
+    // ===== HUD =====
+    function updHUD(){
+        const need=lvl*100;
+        xpFill.style.width=Math.min(xp/need*100,100)+'%';
+        xpTxt.textContent=`${xp}/${need}`;
+        hudLvl.textContent=`Lv. ${lvl}`;
+        hudProg.textContent=`${Math.min(qIdx+1,sessionQs.length)}/${sessionQs.length}`;
+    }
+    function renderHP(){
+        hpBox.innerHTML='';
+        for(let i=0;i<maxHp;i++){const h=document.createElement('i');h.className=(i<hp)?'fa-solid fa-heart':'fa-regular fa-heart';hpBox.appendChild(h);}
+    }
+
+    // ===== LOAD QUESTION =====
+    function loadQuestion(){
+        updHUD();
+        const q=sessionQs[qIdx];
+        qPill.textContent=TOPICS[q.t];
+        qText.innerHTML=q.q;
+
+        // Populate legend
+        lgA.innerHTML=q.o[0]; lgB.innerHTML=q.o[1]; lgC.innerHTML=q.o[2]; lgD.innerHTML=q.o[3];
+
+        // Init asteroids
+        asteroids=[];
+        const L=['A','B','C','D'], C=['#a855f7','#06b6d4','#f59e0b','#ec4899'];
+        const sp=canvas.width/5;
+        for(let i=0;i<4;i++){
+            asteroids.push({i,l:L[i],col:C[i],x:sp*(i+1),y:60+(i%2===0?0:30),r:28,vx:(Math.random()*.8+.4)*(i%2===0?1:-1)});
+        }
+        lasers=[];
+    }
+
+    // ===== GAME LOOP =====
+    function loop(){
+        if(!paused){
+            ctx.fillStyle='#02000c'; ctx.fillRect(0,0,canvas.width,canvas.height);
+            updStars(); drawStars();
+            updLasers(); drawLasers();
+            updAsteroids(); drawAsteroids();
+            drawShip();
+            for(let i=particles.length-1;i>=0;i--){particles[i].upd();if(particles[i].a<=0)particles.splice(i,1);else particles[i].draw();}
+            checkHits();
+        }
+        requestAnimationFrame(loop);
+    }
+
+    // ===== CONTROLS =====
+    canvas.addEventListener('mousemove',e=>{if(paused)return;const r=canvas.getBoundingClientRect();ship.x=Math.max(ship.w/2,Math.min(e.clientX-r.left,canvas.width-ship.w/2));});
+    canvas.addEventListener('click',()=>{if(!paused)fire();});
+    window.addEventListener('keydown',e=>{
+        if(paused)return;
+        if(e.key==='ArrowLeft'||e.key==='a') ship.x=Math.max(ship.w/2,ship.x-18);
+        if(e.key==='ArrowRight'||e.key==='d') ship.x=Math.min(canvas.width-ship.w/2,ship.x+18);
+        if(e.key===' '){e.preventDefault();fire();}
+    });
+    function fire(){sfx.laser();lasers.push({x:ship.x,y:ship.y-2});}
+
+    // ===== SCREEN MANAGEMENT =====
+    function showView(v){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));v.classList.add('active');}
+
+    function initGame(){qIdx=0;hp=3;score=0;xp=0;lvl=1;fails=[];paused=true;prepareSession();renderHP();updHUD();}
+
+    $('start-btn').addEventListener('click',()=>{sfx.click();initGame();showView(vArena);setTimeout(()=>{initCanvas();initStars();loadQuestion();paused=false;},50);});
+    $('quit-btn').addEventListener('click',()=>{sfx.click();if(confirm('Thoát trận chiến?')){paused=true;showView(vTitle);}});
+    $('repair-btn').addEventListener('click',()=>{sfx.click();initGame();showView(vArena);setTimeout(()=>{initCanvas();initStars();loadQuestion();paused=false;},50);});
+    $('vic-btn').addEventListener('click',()=>{sfx.click();showView(vTitle);});
+
+    function triggerGameOver(){
+        paused=true;
+        const el=$('repair-list'); el.innerHTML='';
+        fails.forEach((f,i)=>{const d=document.createElement('div');d.className='fail-item';d.innerHTML=`<div style="font-size:.8rem;font-weight:700;color:var(--hp-ruby);margin-bottom:2px">Câu sai #${i+1}</div><div style="font-weight:600;font-size:.92rem;margin-bottom:4px">${f.qText}</div><div style="color:var(--hp-ruby);font-size:.85rem">Bạn bắn: ${f.wrong}</div><div style="color:var(--success-green);font-size:.85rem;font-weight:600">Đúng: ${f.right}</div><div style="background:rgba(255,255,255,.03);padding:8px;border-radius:6px;font-size:.85rem;margin-top:4px"><b>Giải:</b> ${f.exp}</div>`;el.appendChild(d);});
+        showView(vRepair);
+    }
+    function triggerVictory(){
+        paused=true;
+        $('vc-lvl').textContent=`Lv. ${lvl}`;
+        $('vc-score').textContent=`${score}/${sessionQs.length}`;
+        $('vc-dmg').textContent=`${fails.length} lần`;
+        sfx.lvlUp(); showView(vVictory);
+    }
+
+    // ===== SOUND & THEME & INFO =====
+    const sndT=$('sound-toggle'), thmT=$('theme-toggle'), infoBtn=$('info-btn'), infoModal=$('info-modal'), infoCloseBtn=$('info-close-btn');
+    sfx.on=(localStorage.getItem('sh-snd')||'on')==='on';
+    sndT.querySelector('i').className=sfx.on?'fa-solid fa-volume-high':'fa-solid fa-volume-xmark';
+    sndT.addEventListener('click',()=>{sfx.on=!sfx.on;localStorage.setItem('sh-snd',sfx.on?'on':'off');sndT.querySelector('i').className=sfx.on?'fa-solid fa-volume-high':'fa-solid fa-volume-xmark';sfx.click();});
+    
+    infoBtn.addEventListener('click',()=>{sfx.click();paused=true;infoModal.classList.add('active');});
+    infoCloseBtn.addEventListener('click',()=>{sfx.click();infoModal.classList.remove('active');paused=false;});
+
+    // Start loop
+    loop();
+    </script>
+
+    <!--
+    ======================================================================
+    🚀 GITHUB README.MD MARKDOWN CONTENT
+    ======================================================================
+    Bạn có thể sao chép phần văn bản dưới đây để tạo file README.md khi upload lên GitHub:
+
+    # 🌌 Math Universe 8: Vừa Học Vừa Chơi Toán Lớp 8
+
+    [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://html.spec.whatwg.org/)
+    [![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)](#)
+    [![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](#)
+    [![Obsidian](https://img.shields.io/badge/Obsidian-7C4DFF?style=for-the-badge&logo=obsidian&logoColor=white)](https://obsidian.md/)
+    [![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](#)
+
+    Chào mừng bạn đến với **Math Universe 8** — Hệ sinh thái học tập và ôn tập môn Toán Lớp 8 kết hợp phương pháp Game hóa (Gamification) độc đáo. Dự án này được thiết kế nhằm giúp học sinh ôn thi giữa kì 1 và chuẩn bị thuyết trình môn Toán một cách trực quan, hứng thú và không lo bị quá tải.
+
+    ---
+
+    ## 🎮 Các Trải Nghiệm Học Tập Tương Tác
+    Dự án bao gồm 3 ứng dụng web chạy offline cực kỳ đẹp mắt được tích hợp sẵn:
+    - 🚀 **Galaxy Math Defender (Math_Shooter.html):** Bắn súng không gian 2D cổ điển. Tiêu diệt thiên thạch mang đáp án chính xác để bảo vệ dải ngân hà Toán 8.
+    - ⛰️ **Math Quest (Math_Quest.html):** Vượt qua các trạm thử thách Toán học trên đường chinh phục đỉnh núi Olympus huyền thoại.
+    - 📝 **Chuyên Gia Khảo Thí (Math_Quiz.html):** Hệ thống thi thử trắc nghiệm Toán 8 đa chế độ, tích hợp Trợ lý ảo giải thích chi tiết từng bước.
+
+    ---
+
+    ## 📅 Sổ Tay Quản Lý Dự Án (Obsidian)
+    - 📋 **ON THI GIUA KI 1 TOAN.md:** Bản kế hoạch phân bổ thời gian hàng tuần để ôn lý thuyết và làm đề minh họa.
+    - 📢 **THUYET TRINH TOAN.md:** Dàn ý chi tiết cho bài thuyết trình nhóm về "Ứng dụng định lý Pythagore trong thực tế".
+
+    ---
+
+    ## 🛠️ Công Nghệ Sử Dụng
+    Dự án được xây dựng 100% bằng các công nghệ frontend thuần: HTML5, CSS3, và JavaScript thuần (Canvas API) chạy trực tiếp trên trình duyệt, hoàn toàn offline.
+
+    ---
+
+    ## 📁 Cấu Trúc Thư Mục Dự Án
+    - **01_Projects/**: Chứa toàn bộ tài nguyên game (`Math_Shooter.html`, `Math_Quest.html`, `Math_Quiz.html`) và kế hoạch ôn tập (`ON THI GIUA KI 1 TOAN.md`, `THUYET TRINH TOAN.md`).
+    - **02_Areas/**: Lưu trữ tài liệu học tập các môn khác (nếu có).
+    - **03_Resources/**: Tài nguyên tham khảo, công thức, đề thi.
+    - **04_Archives/**: Nơi cất giữ các bài tập, nhiệm vụ đã hoàn thành.
+    ======================================================================
+    -->
+</body>
+</html>

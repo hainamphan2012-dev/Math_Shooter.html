@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Trò chơi học tập nhập vai giúp học sinh lớp 8 tự luyện tập các kỹ năng Toán học cốt lõi bằng cách vượt qua các Trạm thử thách trên đỉnh Olympus.">
+    <title>Math Quest: Chinh Phục Đỉnh Olympus - Toán 8</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Medieval RPG Fantasy Color Palette */
+            --amber-glow: #f59e0b;
+            --amber-dark: #b45309;
+            --emerald-forest: #10b981;
+            --ruby-heart: #ef4444;
+            --sapphire-magic: #3b82f6;
+            --amethyst-cosmic: #8b5cf6;
+            
+            --bg-dark: radial-gradient(circle at center, #1e1b24 0%, #0d0b0f 100%);
+            --card-bg: rgba(30, 27, 36, 0.65);
+            --card-border: rgba(245, 158, 11, 0.15);
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --btn-bg: rgba(245, 158, 11, 0.08);
+            --btn-hover: rgba(245, 158, 11, 0.18);
+            --btn-border: rgba(245, 158, 11, 0.3);
+            
+            --font-fantasy: 'Cinzel', serif;
+            --font-standard: 'Plus Jakarta Sans', sans-serif;
+            --transition-rpg: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-dark: radial-gradient(circle at center, #f5f4f7 0%, #e5e4e9 100%);
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: rgba(180, 83, 9, 0.25);
+            --text-main: #1f1d24;
+            --text-muted: #5e5a66;
+            --btn-bg: rgba(180, 83, 9, 0.06);
+            --btn-hover: rgba(180, 83, 9, 0.14);
+            --btn-border: rgba(180, 83, 9, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-standard);
+            background: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+            transition: background 0.5s ease;
+        }
+
+        /* Ambient Glow effects */
+        .ambient-effects {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .ambient-glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.1;
+            animation: orbFloat 25s infinite ease-in-out alternate;
+        }
+
+        .orb-red {
+            width: 350px;
+            height: 350px;
+            background: var(--ruby-heart);
+            top: 20%;
+            left: 5%;
+        }
+
+        .orb-gold {
+            width: 450px;
+            height: 450px;
+            background: var(--amber-glow);
+            bottom: 15%;
+            right: 5%;
+            animation-delay: -7s;
+        }
+
+        @keyframes orbFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 40px) scale(1.1); }
+        }
+
+        /* Game Header */
+        header {
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+            background: rgba(13, 11, 15, 0.4);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        .game-title {
+            font-family: var(--font-fantasy);
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: var(--amber-glow);
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .header-btns {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .header-btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--btn-border);
+            color: var(--text-main);
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: var(--transition-rpg);
+        }
+
+        .header-btn:hover {
+            border-color: var(--amber-glow);
+            color: var(--amber-glow);
+            background: var(--btn-hover);
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.15);
+        }
+
+        /* Main Game Viewport */
+        main {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            z-index: 5;
+        }
+
+        .game-card {
+            width: 100%;
+            max-width: 820px;
+            min-height: 560px;
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2.25rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-screen {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            flex-grow: 1;
+            animation: slideFadeIn 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        .game-screen.active {
+            display: flex;
+        }
+
+        @keyframes slideFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Character Selection Cards */
+        .char-selection-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1.5rem 0 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .char-selection-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .char-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--btn-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: var(--transition-rpg);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .char-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--amber-glow);
+            background: rgba(245, 158, 11, 0.03);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.1);
+        }
+
+        .char-card.selected {
+            border-color: var(--amber-glow);
+            background: rgba(245, 158, 11, 0.08);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+            transform: scale(1.02);
+        }
+
+        .char-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--btn-bg);
+            border: 2px solid var(--btn-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            color: var(--amber-glow);
+            margin-bottom: 0.5rem;
+            transition: var(--transition-rpg);
+        }
+
+        .char-card.selected .char-avatar {
+            border-color: var(--amber-glow);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+            background: rgba(245, 158, 11, 0.15);
+        }
+
+        .char-name {
+            font-family: var(--font-fantasy);
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .char-perks {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
+
+        .perk-highlight {
+            color: var(--amber-glow);
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .btn-rpg {
+            font-family: var(--font-fantasy);
+            background: var(--btn-bg);
+            border: 2px solid var(--btn-border);
+            color: var(--amber-glow);
+            padding: 0.9rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: 0.05em;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: var(--transition-rpg);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+
+        .btn-rpg:hover {
+            transform: translateY(-2px);
+            background: var(--btn-hover);
+            border-color: var(--amber-glow);
+            box-shadow: 0 8px 15px rgba(245, 158, 11, 0.25);
+            color: var(--text-main);
+        }
+
+        .btn-rpg:active {
+            transform: translateY(0);
+        }
+
+        .btn-rpg[disabled] {
+            opacity: 0.4;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        /* Map Progression Camp Layout */
+        .map-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            border: 1px solid var(--btn-border);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .map-path {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            padding: 1rem 0;
+        }
+
+        .map-line-back {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 4px;
+            background: var(--btn-border);
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .map-line-front {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            width: 0%;
+            height: 4px;
+            background: var(--amber-glow);
+            z-index: 2;
+            transform: translateY(-50%);
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 8px var(--amber-glow);
+        }
+
+        .map-node {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg-dark);
+            border: 2px solid var(--btn-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            font-weight: 700;
+            z-index: 3;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition-rpg);
+        }
+
+        .map-node.unlocked {
+            border-color: var(--amber-glow);
+            color: var(--amber-glow);
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .map-node.current {
+            border-color: var(--amethyst-cosmic);
+            background: var(--amethyst-cosmic);
+            color: white;
+            transform: scale(1.15);
+            box-shadow: 0 0 15px var(--amethyst-cosmic);
+            animation: pulseCurrentNode 1.5s infinite alternate;
+        }
+
+        @keyframes pulseCurrentNode {
+            0% { box-shadow: 0 0 5px var(--amethyst-cosmic); }
+            100% { box-shadow: 0 0 18px var(--amethyst-cosmic); }
+        }
+
+        .map-node.cleared {
+            border-color: var(--emerald-forest);
+            background: var(--emerald-forest);
+            color: white;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }
+
+        .map-node-label {
+            position: absolute;
+            top: -24px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            white-space: nowrap;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .map-node.current .map-node-label {
+            color: var(--amethyst-cosmic);
+        }
+
+        .map-node.cleared .map-node-label {
+            color: var(--emerald-forest);
+        }
+
+        @media (max-width: 600px) {
+            .map-path {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: flex-start;
+                padding-left: 2rem;
+            }
+            .map-line-back {
+                left: 2.2rem;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                height: 100%;
+                transform: translateX(-50%);
+            }
+            .map-line-front {
+                left: 2.2rem;
+                top: 0;
+                width: 4px;
+                height: 0%;
+                transform: translateX(-50%);
+            }
+            .map-node-label {
+                left: 60px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+        }
+
+        /* RPG Stats Panel */
+        .rpg-stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.75rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hearts-container {
+            display: flex;
+            gap: 3px;
+            color: var(--ruby-heart);
+            font-size: 1.05rem;
+        }
+
+        .xp-bar-container {
+            width: 100px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid var(--btn-border);
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+
+        .xp-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--amber-glow);
+            transition: width 0.4s ease;
+        }
+
+        .shield-active {
+            color: var(--sapphire-magic);
+            animation: pulseShield 1.5s infinite alternate;
+        }
+
+        @keyframes pulseShield {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+
+        /* Camp Arena Combat Design */
+        .arena-camp-title {
+            text-align: center;
+            font-family: var(--font-fantasy);
+            font-size: 1.15rem;
+            color: var(--amber-glow);
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        .arena-question-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.45;
+            text-align: center;
+        }
+
+        .arena-options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .opt-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--btn-border);
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            color: var(--text-main);
+            font-family: var(--font-standard);
+            font-size: 0.98rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition-rpg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .opt-btn:hover:not([disabled]) {
+            background: var(--btn-hover);
+            border-color: var(--amber-glow);
+            transform: translateX(3px);
+        }
+
+        .opt-btn.selected {
+            border-color: var(--amethyst-cosmic);
+            background: rgba(139, 92, 246, 0.08);
+        }
+
+        .opt-btn.correct {
+            border-color: var(--emerald-forest) !important;
+            background: rgba(16, 185, 129, 0.1) !important;
+            color: var(--emerald-forest);
+            font-weight: 700;
+        }
+
+        .opt-btn.incorrect {
+            border-color: var(--ruby-heart) !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+            color: var(--ruby-heart);
+            font-weight: 700;
+        }
+
+        .opt-letter {
+            font-weight: 800;
+            color: var(--amber-glow);
+            margin-right: 0.5rem;
+        }
+
+        .combat-feedback {
+            display: none;
+            padding: 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            animation: slideDown 0.3s ease;
+        }
+
+        .feedback-correct {
+            background: rgba(16, 185, 129, 0.08);
+            border-left: 4px solid var(--emerald-forest);
+        }
+
+        .feedback-incorrect {
+            background: rgba(239, 68, 68, 0.08);
+            border-left: 4px solid var(--ruby-heart);
+        }
+
+        .feedback-header {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feedback-header.correct { color: var(--emerald-forest); }
+        .feedback-header.incorrect { color: var(--ruby-heart); }
+
+        .explanation-text {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            line-height: 1.5;
+        }
+
+        .math-expr {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-size: 1.1em;
+            background: rgba(255, 255, 255, 0.04);
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+            font-style: italic;
+        }
+
+        .math-block {
+            display: block;
+            text-align: center;
+            margin: 0.5rem auto;
+            padding: 0.4rem;
+            font-size: 1.15em;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            width: fit-content;
+        }
+
+        /* Backpack/Inventory Modal */
+        .inventory-modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .inventory-modal.active {
+            display: flex;
+        }
+
+        .inventory-content {
+            background: #19161f;
+            border: 2px solid var(--amber-glow);
+            border-radius: 16px;
+            max-width: 680px;
+            width: 100%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            animation: zoomIn 0.25s ease-out forwards;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .inventory-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--btn-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .inventory-title {
+            font-family: var(--font-fantasy);
+            color: var(--amber-glow);
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .close-inv-btn {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: var(--transition-rpg);
+        }
+
+        .close-inv-btn:hover {
+            color: var(--ruby-heart);
+            transform: scale(1.1);
+        }
+
+        .inventory-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .scrolls-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        @media (max-width: 550px) {
+            .scrolls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scroll-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed var(--btn-border);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: not-allowed;
+            opacity: 0.5;
+            transition: var(--transition-rpg);
+        }
+
+        .scroll-item.unlocked {
+            border-style: solid;
+            border-color: var(--amber-glow);
+            background: rgba(245, 158, 11, 0.04);
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        .scroll-item.unlocked:hover {
+            background: rgba(245, 158, 11, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .scroll-icon {
+            font-size: 2rem;
+            color: var(--text-muted);
+        }
+
+        .scroll-item.unlocked .scroll-icon {
+            color: var(--amber-glow);
+        }
+
+        .scroll-name {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .scroll-status {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .scroll-item.unlocked .scroll-status {
+            color: var(--emerald-forest);
+        }
+
+        /* Scroll Inspector Ghi chú */
+        .scroll-viewer {
+            display: none;
+            margin-top: 1.25rem;
+            background: rgba(245, 158, 11, 0.05);
+            border: 1px solid var(--amber-glow);
+            border-radius: 10px;
+            padding: 1.25rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .scroll-viewer-header {
+            font-family: var(--font-fantasy);
+            color: var(--amber-glow);
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--btn-border);
+            padding-bottom: 0.25rem;
+        }
+
+        .scroll-viewer-content {
+            font-size: 0.88rem;
+            line-height: 1.5;
+        }
+
+        /* Campfire / GameOver screen styling */
+        .campfire-screen {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        /* Cute CSS Campfire Animation */
+        .campfire-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 1rem;
+        }
+
+        .log {
+            position: absolute;
+            width: 80px;
+            height: 16px;
+            background: #78350f;
+            border-radius: 8px;
+            bottom: 15px;
+            left: 20px;
+        }
+
+        .log-1 { transform: rotate(-15deg); }
+        .log-2 { transform: rotate(15deg); }
+
+        .fire {
+            position: absolute;
+            bottom: 25px;
+            left: 35px;
+            width: 50px;
+            height: 50px;
+            background: var(--ruby-heart);
+            border-radius: 50% 50% 0 50%;
+            transform: rotate(-45deg);
+            animation: burn 1.2s infinite alternate;
+            filter: blur(1px);
+        }
+
+        .fire-inner {
+            position: absolute;
+            bottom: 25px;
+            left: 45px;
+            width: 30px;
+            height: 30px;
+            background: var(--amber-glow);
+            border-radius: 50% 50% 0 50%;
+            transform: rotate(-45deg);
+            animation: burnInner 0.8s infinite alternate;
+        }
+
+        @keyframes burn {
+            0% { transform: rotate(-45deg) scale(0.9); background: var(--ruby-heart); }
+            100% { transform: rotate(-45deg) scale(1.1); background: #f97316; }
+        }
+
+        @keyframes burnInner {
+            0% { transform: rotate(-45deg) scale(0.8); }
+            100% { transform: rotate(-45deg) scale(1.15); }
+        }
+
+        .spark {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--amber-glow);
+            border-radius: 50%;
+            animation: flySpark 2s infinite linear;
+        }
+
+        .spark-1 { left: 45px; animation-delay: 0.2s; }
+        .spark-2 { left: 60px; animation-delay: 0.8s; }
+        .spark-3 { left: 55px; animation-delay: 1.4s; }
+
+        @keyframes flySpark {
+            0% { bottom: 35px; opacity: 1; transform: scale(1); }
+            100% { bottom: 100px; opacity: 0; transform: scale(0.3) translateX(20px); }
+        }
+
+        /* Failed review panel in Campfire */
+        .campfire-review {
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border: 1px solid var(--btn-border);
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .campfire-review-item {
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .campfire-review-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Canvas Confetti */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 99;
+            pointer-events: none;
+            display: none;
+        }
+
+        /* Footer styling */
+        footer {
+            text-align: center;
+            padding: 1.25rem;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--card-border);
+            background: rgba(13, 11, 15, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--btn-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--amber-glow);
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Ambient Orbs -->
+    <div class="ambient-effects">
+        <div class="ambient-glow-orb orb-red"></div>
+        <div class="ambient-glow-orb orb-gold"></div>
+    </div>
+
+    <!-- Canvas Confetti Overlay -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Header bar -->
+    <header>
+        <h1 class="game-title">
+            <i class="fa-solid fa-dragon"></i>
+            <span>Math Quest</span>
+        </h1>
+        <div class="header-btns">
+            <button class="header-btn" id="open-backpack-btn" title="Mở túi đồ cứu trợ" aria-label="Open backpack">
+                <i class="fa-solid fa-suitcase"></i>
+            </button>
+            <button class="header-btn" id="sound-toggle" title="Âm thanh trò chơi" aria-label="Toggle sound">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button class="header-btn" id="theme-toggle" title="Sáng/Tối" aria-label="Toggle theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main View Area -->
+    <main>
+        <div class="game-card" id="game-card-el">
+            
+            <!-- SCREEN 1: LOBBY / SETUP -->
+            <div class="game-screen active" id="lobby-screen">
+                <div style="text-align: center;">
+                    <h2 style="font-family: var(--font-fantasy); color: var(--amber-glow); font-size: 1.8rem; margin-bottom: 0.5rem;">
+                        Chinh Phục Đỉnh Olympus
+                    </h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">
+                        Hãy chọn một nhân vật đồng hành để cùng leo núi và khám phá tri thức toán học!
+                    </p>
+                </div>
+
+                <!-- Character selection -->
+                <div class="char-selection-grid">
+                    <!-- Class 1 -->
+                    <div class="char-card selected" data-class="knight">
+                        <div class="char-avatar"><i class="fa-solid fa-shield-halved"></i></div>
+                        <div class="char-name">Hiệp Sĩ Đại Số</div>
+                        <div class="char-perks">
+                            HP ban đầu: <span class="perk-highlight">4 ❤️</span><br>
+                            Mẹo: Có sức bền tốt để chịu sai sót, nhận <span class="perk-highlight">-10% XP</span>.
+                        </div>
+                    </div>
+                    <!-- Class 2 -->
+                    <div class="char-card" data-class="wizard">
+                        <div class="char-avatar"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <div class="char-name">Phù Thủy Hình Học</div>
+                        <div class="char-perks">
+                            HP ban đầu: <span class="perk-highlight">3 ❤️</span><br>
+                            Perk: Có sẵn <span class="perk-highlight">1 Khiên phép 🛡️</span> chặn đứng 1 lần trả lời sai.
+                        </div>
+                    </div>
+                    <!-- Class 3 -->
+                    <div class="char-card" data-class="explorer">
+                        <div class="char-avatar"><i class="fa-solid fa-compass"></i></div>
+                        <div class="char-name">Nhà Thám Hiểm</div>
+                        <div class="char-perks">
+                            HP ban đầu: <span class="perk-highlight">3 ❤️</span><br>
+                            Perk: Nhận <span class="perk-highlight">Gấp đôi XP</span> khi đạt chuỗi combo trả lời đúng.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Intro note -->
+                <div style="background: rgba(0, 0, 0, 0.2); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.85rem; color: var(--text-muted); text-align: center; border: 1px solid rgba(255, 255, 255, 0.03);">
+                    <i class="fa-solid fa-circle-info" style="color: var(--amber-glow);"></i> 
+                    Trò chơi gồm 6 trạm ôn luyện Toán 8. Hãy làm bài thật cẩn thận để nhặt bí kíp và bảo vệ mạng sống!
+                </div>
+
+                <div style="text-align: center; margin-top: 1.5rem;">
+                    <button type="button" class="btn-rpg" id="start-game-btn">
+                        <span>Bắt đầu cuộc hành trình</span>
+                        <i class="fa-solid fa-scroll"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCREEN 2: GAME ARENA (COMBAT / SOLVING) -->
+            <div class="game-screen" id="arena-screen">
+                <!-- RPG Stats display -->
+                <div class="rpg-stats-bar">
+                    <div class="stat-item" id="player-avatar-mini">
+                        <i class="fa-solid fa-shield-halved" style="color: var(--amber-glow);"></i>
+                        <span id="player-level-display">Lv. 1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Máu:</span>
+                        <div class="hearts-container" id="hearts-container-el">
+                            <!-- Hearts rendered dynamically -->
+                        </div>
+                    </div>
+                    <div class="stat-item" id="shield-indicator-container">
+                        <span id="shield-indicator" class="shield-active" style="display: none;">
+                            <i class="fa-solid fa-shield-cat"></i> Chắn 1
+                        </span>
+                    </div>
+                    <div class="stat-item">
+                        <span>XP:</span>
+                        <div class="xp-bar-container">
+                            <div class="xp-bar-fill" id="xp-bar-fill-el"></div>
+                        </div>
+                        <span id="xp-text-el" style="font-size: 0.75rem; color: var(--text-muted); margin-left: 4px;">0/100</span>
+                    </div>
+                </div>
+
+                <!-- Current Camp Info -->
+                <div class="arena-camp-title" id="arena-camp-title-el">
+                    Trạm 1: Đèo Hằng Đẳng Thức (Câu 1/3)
+                </div>
+
+                <!-- Question Box -->
+                <div class="arena-question-box">
+                    <div class="question-text" id="question-text-el">
+                        Câu hỏi mẫu ở đây...
+                    </div>
+                </div>
+
+                <!-- Option selection -->
+                <div class="arena-options-grid" id="arena-options-grid-el">
+                    <!-- Option buttons populated by JS -->
+                </div>
+
+                <!-- Feedback panel with solution -->
+                <div class="combat-feedback" id="combat-feedback-el">
+                    <div class="feedback-header" id="feedback-header-el">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Chính xác!</span>
+                    </div>
+                    <div class="explanation-text" id="explanation-text-el">
+                        Lời giải chi tiết và công thức hỗ trợ...
+                    </div>
+                </div>
+
+                <!-- Arena Footer Navigations -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+                    <button type="button" class="btn-rpg" id="quit-arena-btn" style="padding: 0.6rem 1.2rem; font-size: 0.9rem; border-color: rgba(239, 68, 68, 0.3); color: var(--ruby-heart);">
+                        <i class="fa-solid fa-person-running"></i>
+                        <span>Chạy trốn</span>
+                    </button>
+                    <button type="button" class="btn-rpg" id="next-stage-btn" disabled>
+                        <span>Đi tiếp</span>
+                        <i class="fa-solid fa-arrow-right-long"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCREEN 3: CAMPFIRE / GAMEOVER -->
+            <div class="game-screen campfire-screen" id="campfire-screen">
+                <h2 style="font-family: var(--font-fantasy); color: var(--ruby-heart); font-size: 1.8rem;">
+                    Nghỉ Chân Bên Đống Lửa
+                </h2>
+                
+                <!-- Cute camp fire anim -->
+                <div class="campfire-wrapper">
+                    <div class="log log-1"></div>
+                    <div class="log log-2"></div>
+                    <div class="fire"></div>
+                    <div class="fire-inner"></div>
+                    <div class="spark spark-1"></div>
+                    <div class="spark spark-2"></div>
+                    <div class="spark spark-3"></div>
+                </div>
+
+                <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 500px;">
+                    Bạn đã hết máu. Đây là lúc nghỉ ngơi, chuẩn bị dụng cụ học tập và rà soát lại các câu trả lời sai trước khi leo tiếp!
+                </p>
+
+                <!-- Failed list -->
+                <div class="campfire-review" id="campfire-review-el">
+                    <!-- Populate failed questions and explanations -->
+                </div>
+
+                <!-- Retry -->
+                <div>
+                    <button type="button" class="btn-rpg" id="campfire-retry-btn">
+                        <span>Hồi sinh & Thử lại</span>
+                        <i class="fa-solid fa-fire-flame-curved"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SCREEN 4: VICTORY -->
+            <div class="game-screen" id="victory-screen" style="text-align: center; display: none;">
+                <div style="margin-bottom: 1.5rem;">
+                    <i class="fa-solid fa-crown" style="font-size: 3.5rem; color: var(--amber-glow); filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.4)); animation: pulseCurrentNode 1.5s infinite alternate;"></i>
+                </div>
+                
+                <h2 style="font-family: var(--font-fantasy); color: var(--amber-glow); font-size: 1.8rem; margin-bottom: 0.5rem;">
+                    Bậc Thầy Toán Học Lớp 8
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; max-width: 500px; margin: 0 auto 1.5rem auto;">
+                    Xin chúc mừng! Bạn đã chinh phục thành công đỉnh Olympus, giải phóng 6 Trạm lý thuyết và thu thập toàn bộ các cuộn bí kíp Toán học.
+                </p>
+
+                <!-- Stats summary -->
+                <div style="background: rgba(0, 0, 0, 0.25); border-radius: 12px; border: 1px solid var(--btn-border); padding: 1.25rem; max-width: 450px; margin: 0 auto 2rem auto; text-align: left; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Nhân vật:</span>
+                        <span id="vic-char-class" style="font-weight: 700; color: var(--amber-glow);">Hiệp Sĩ</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Cấp độ cuối cùng:</span>
+                        <span id="vic-level" style="font-weight: 700; color: var(--amethyst-cosmic);">Level 3</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Số câu đúng:</span>
+                        <span id="vic-correct" style="font-weight: 700; color: var(--emerald-forest);">18/18</span>
+                    </div>
+                </div>
+
+                <div>
+                    <button type="button" class="btn-rpg" id="victory-restart-btn">
+                        <span>Bắt đầu cuộc phiêu lưu mới</span>
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- INVENTORY MODAL (BACKPACK) -->
+    <div class="inventory-modal" id="inventory-modal-el">
+        <div class="inventory-content">
+            <div class="inventory-header">
+                <span class="inventory-title">
+                    <i class="fa-solid fa-suitcase"></i>
+                    <span>Túi Đồ Cứu Trợ Lý Thuyết</span>
+                </span>
+                <button type="button" class="close-inv-btn" id="close-backpack-btn">&times;</button>
+            </div>
+            
+            <div class="inventory-body">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                    Vượt qua các trạm trên núi để mở khóa "Bí kíp lý thuyết" tương ứng. Click vào bí kíp đã mở khóa để xem tóm tắt công thức ngay lập tức!
+                </p>
+                
+                <div class="scrolls-grid" id="scrolls-grid-el">
+                    <!-- Scrolls generated by JS -->
+                </div>
+                
+                <!-- Inspector of current scroll -->
+                <div class="scroll-viewer" id="scroll-viewer-el">
+                    <div class="scroll-viewer-header" id="scroll-viewer-title-el">Bí kíp Hằng Đẳng Thức</div>
+                    <div class="scroll-viewer-content" id="scroll-viewer-content-el">Nội dung...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Copyright -->
+    <footer>
+        <p>Phát triển bởi <strong>Chuyên gia Thiết kế Đề thi & Khảo thí Toán 8</strong></p>
+        <p style="margin-top: 4px; font-size: 0.72rem; color: var(--text-muted);">
+            Nhấn vào Túi đồ <i class="fa-solid fa-suitcase"></i> bất kỳ lúc nào để tra cứu công thức của các trạm đã giải phóng.
+        </p>
+    </footer>
+
+    <!-- Game Engine -->
+    <script>
+        // --- SOUND EFFECTS GENERATOR (Web Audio API) ---
+        class GameSoundEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playCorrect() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                
+                // Energetic double-beep for success
+                this.playTone(587.33, 0.08, now); // D5
+                this.playTone(880.00, 0.12, now + 0.07); // A5
+            }
+
+            playIncorrect() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                
+                // Downward disorienting notes
+                this.playTone(220.00, 0.15, now, 'sawtooth', 0.1); // A3
+                this.playTone(164.81, 0.25, now + 0.1, 'sawtooth', 0.1); // E3
+            }
+
+            playLevelUp() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                
+                // Uplifting arpeggio
+                this.playTone(523.25, 0.1, now); // C5
+                this.playTone(659.25, 0.1, now + 0.08); // E5
+                this.playTone(783.99, 0.1, now + 0.16); // G5
+                this.playTone(1046.50, 0.25, now + 0.24, 'sine', 0.18); // C6
+            }
+
+            playFanfare() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                
+                // Regal triumphant motif
+                this.playTone(587.33, 0.12, now); // D5
+                this.playTone(587.33, 0.12, now + 0.15); // D5
+                this.playTone(587.33, 0.12, now + 0.3); // D5
+                this.playTone(880.00, 0.45, now + 0.45, 'sine', 0.2); // A5
+            }
+
+            playClick() {
+                if (!this.enabled) return;
+                this.init();
+                const now = this.ctx.currentTime;
+                this.playTone(600, 0.04, now, 'sine', 0.1);
+            }
+
+            playTone(freq, duration, startTime, type = 'sine', volume = 0.15) {
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, startTime);
+                    
+                    gain.gain.setValueAtTime(volume, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+                    
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                } catch (e) {
+                    console.error("Audio error:", e);
+                }
+            }
+        }
+
+        const sounds = new GameSoundEngine();
+
+        // --- GAME QUESTION & SCROLL DATABASE ---
+        const GAME_STATIONS = [
+            {
+                id: 0,
+                name: "Đèo Hằng Đẳng Thức",
+                file: "7 hằng đẳng thức đáng nhớ.md",
+                theory: `
+                    <b>Bình phương của một tổng/hiệu:</b>
+                    <div class="math-block">(A &plusmn; B)<sup>2</sup> = A<sup>2</sup> &plusmn; 2AB + B<sup>2</sup></div>
+                    <b>Hiệu hai bình phương:</b>
+                    <div class="math-block">A<sup>2</sup> - B<sup>2</sup> = (A - B)(A + B)</div>
+                    <b>Lập phương của tổng/hiệu:</b>
+                    <div class="math-block">(A &plusmn; B)<sup>3</sup> = A<sup>3</sup> &plusmn; 3A<sup>2</sup>B + 3AB<sup>2</sup> &plusmn; B<sup>3</sup></div>
+                    <b>Tổng/Hiệu hai lập phương:</b>
+                    <div class="math-block">A<sup>3</sup> &plusmn; B<sup>3</sup> = (A &plusmn; B)(A<sup>2</sup> &mp; AB + B<sup>2</sup>)</div>
+                    <i>*Mẹo nhớ: Với lập phương hiệu, dấu đan xen (+ &rarr; - &rarr; + &rarr; -). Bình phương thiếu có dấu trái ngược ngoặc thứ nhất.</i>
+                `,
+                questions: [
+                    {
+                        question: "Khai triển biểu thức <span class='math-expr'>(x + 3)<sup>2</sup></span> ta được kết quả là:",
+                        options: ["x<sup>2</sup> + 3x + 9", "x<sup>2</sup> + 6x + 9", "x<sup>2</sup> + 9", "x<sup>2</sup> - 6x + 9"],
+                        correctAnswerIndex: 1,
+                        explanation: "Áp dụng hằng đẳng thức số 1: <span class='math-expr'>(A + B)<sup>2</sup> = A<sup>2</sup> + 2AB + B<sup>2</sup></span>. Với <span class='math-expr'>A = x, B = 3</span>:<br><span class='math-block'>(x + 3)<sup>2</sup> = x<sup>2</sup> + 2&middot;x&middot;3 + 3<sup>2</sup> = x<sup>2</sup> + 6x + 9</span>"
+                    },
+                    {
+                        question: "Quy tắc đan dấu <i>'Cộng &rarr; Trừ &rarr; Cộng &rarr; Trừ'</i> áp dụng cho dạng khai triển của hằng đẳng thức nào sau đây?",
+                        options: ["(A + B)<sup>3</sup>", "(A - B)<sup>3</sup>", "A<sup>3</sup> - B<sup>3</sup>", "(A - B)<sup>2</sup>"],
+                        correctAnswerIndex: 1,
+                        explanation: "Theo mẹo nhớ nhanh: Lập phương của một hiệu <span class='math-expr'>(A - B)<sup>3</sup></span> có dấu đan xen kẽ: <span class='math-expr'>+A<sup>3</sup> - 3A<sup>2</sup>B + 3AB<sup>2</sup> - B<sup>3</sup></span>."
+                    },
+                    {
+                        question: "Biểu thức khai triển của <span class='math-expr'>A<sup>3</sup> - B<sup>3</sup></span> bằng tích nào dưới đây?",
+                        options: ["(A - B)(A<sup>2</sup> - AB + B<sup>2</sup>)", "(A - B)(A<sup>2</sup> + AB + B<sup>2</sup>)", "(A + B)(A<sup>2</sup> - AB + B<sup>2</sup>)", "(A - B)(A<sup>2</sup> + 2AB + B<sup>2</sup>)"],
+                        correctAnswerIndex: 1,
+                        explanation: "Hằng đẳng thức hiệu hai lập phương: <span class='math-expr'>A<sup>3</sup> - B<sup>3</sup> = (A - B)(A<sup>2</sup> + AB + B<sup>2</sup>)</span>. Ngoặc thứ hai là bình phương thiếu của một tổng (mang toàn dấu cộng)."
+                    }
+                ]
+            },
+            {
+                id: 1,
+                name: "Vực Thẳm Vi-ét",
+                file: "Hệ thức Vi-ét.md",
+                theory: `
+                    Nếu pt bậc hai <span class='math-expr'>ax<sup>2</sup> + bx + c = 0 (a &ne; 0)</span> có nghiệm, hệ thức Vi-ét cho biết:
+                    <div class="math-block">S = x<sub>1</sub> + x<sub>2</sub> = -b / a</div>
+                    <div class="math-block">P = x<sub>1</sub> &middot; x<sub>2</sub> = c / a</div>
+                    <b>Các trường hợp nhẩm nghiệm đặc biệt:</b>
+                    <ul>
+                      <li>Nếu <span class='math-expr'>a + b + c = 0</span> &rArr; <span class='math-expr'>x<sub>1</sub> = 1, x<sub>2</sub> = c / a</span></li>
+                      <li>Nếu <span class='math-expr'>a - b + c = 0</span> &rArr; <span class='math-expr'>x<sub>1</sub> = -1, x<sub>2</sub> = -c / a</span></li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        question: "Định lý Vi-ét phát biểu về tổng <span class='math-expr'>S</span> và tích <span class='math-expr'>P</span> của hai nghiệm phương trình bậc hai là:",
+                        options: ["S = -b/a, P = c/a", "S = b/a, P = -c/a", "S = -b/a, P = -c/a", "S = b/a, P = c/a"],
+                        correctAnswerIndex: 0,
+                        explanation: "Công thức cơ bản của định lý Vi-ét: Tổng <span class='math-expr'>x<sub>1</sub>+x<sub>2</sub> = -b/a</span>, Tích <span class='math-expr'>x<sub>1</sub>&middot;x<sub>2</sub> = c/a</span>."
+                    },
+                    {
+                        question: "Nhẩm nghiệm nhanh phương trình bậc hai <span class='math-expr'>x<sup>2</sup> - 5x + 4 = 0</span> bằng hệ thức Vi-ét ta được:",
+                        options: ["x<sub>1</sub> = 1, x<sub>2</sub> = -4", "x<sub>1</sub> = -1, x<sub>2</sub> = -4", "x<sub>1</sub> = 1, x<sub>2</sub> = 4", "x<sub>1</sub> = -1, x<sub>2</sub> = 4"],
+                        correctAnswerIndex: 2,
+                        explanation: "Hệ số: <span class='math-expr'>a=1, b=-5, c=4</span>. Tổng <span class='math-expr'>a+b+c = 1 + (-5) + 4 = 0</span>.<br>Do đó phương trình có hai nghiệm: <span class='math-expr'>x<sub>1</sub>=1</span> và <span class='math-expr'>x<sub>2</sub>=c/a = 4</span>."
+                    },
+                    {
+                        question: "Nếu phương trình bậc hai <span class='math-expr'>ax<sup>2</sup> + bx + c = 0</span> có <span class='math-expr'>a - b + c = 0</span> thì hai nghiệm của nó sẽ là:",
+                        options: ["x<sub>1</sub> = 1, x<sub>2</sub> = c/a", "x<sub>1</sub> = -1, x<sub>2</sub> = -c/a", "x<sub>1</sub> = -1, x<sub>2</sub> = c/a", "x<sub>1</sub> = 1, x<sub>2</sub> = -c/a"],
+                        correctAnswerIndex: 1,
+                        explanation: "Quy tắc nhẩm nghiệm đặc biệt số hai: Khi hệ số thỏa mãn <span class='math-expr'>a - b + c = 0</span> thì một nghiệm luôn bằng <span class='math-expr'>-1</span> và nghiệm kia là <span class='math-expr'>-c/a</span>."
+                    }
+                ]
+            },
+            {
+                id: 2,
+                name: "Thung Lũng Tứ Giác",
+                file: "cac loai tu giac.md",
+                theory: `
+                    <b>Sơ đồ tiến hóa tứ giác:</b>
+                    Tứ giác &rarr; Hình thang &rarr; Hình bình hành &rarr; Hình thoi / Hình chữ nhật &rarr; Hình vuông.
+                    <b>Chứng minh Hình bình hành:</b>
+                    <ul>
+                      <li>Các cạnh đối song song hoặc bằng nhau.</li>
+                      <li><b>Một cặp cạnh đối vừa song song vừa bằng nhau</b> (dùng nhiều nhất).</li>
+                      <li>Hai đường chéo cắt nhau tại trung điểm mỗi đường.</li>
+                    </ul>
+                    <b>Hình vuông:</b> Là hình chữ nhật có 2 cạnh kề bằng nhau / 2 đường chéo vuông góc. Hoặc hình thoi có 1 góc vuông / 2 đường chéo bằng nhau.
+                `,
+                questions: [
+                    {
+                        question: "Cách nào hay dùng nhiều nhất để chứng minh một tứ giác là hình bình hành?",
+                        options: ["Có các góc đối bằng nhau.", "Có hai đường chéo cắt nhau tại trung điểm.", "Có các cạnh đối bằng nhau.", "Có một cặp cạnh đối song song và bằng nhau."],
+                        correctAnswerIndex: 3,
+                        explanation: "Trong hình học lớp 8, dấu hiệu có <i>một cặp cạnh đối song song và bằng nhau</i> là dấu hiệu trực quan và tiện lợi nhất để chứng minh tứ giác là hình bình hành."
+                    },
+                    {
+                        question: "Để một Hình bình hành trở thành một Hình chữ nhật, ta cần thêm yếu tố nào sau đây?",
+                        options: ["Có 2 cạnh kề bằng nhau.", "Có 2 đường chéo vuông góc.", "Có 2 đường chéo bằng nhau (hoặc 1 góc vuông).", "Có các góc đối bằng nhau."],
+                        correctAnswerIndex: 2,
+                        explanation: "Hình chữ nhật có 2 đường chéo bằng nhau hoặc 1 góc vuông. Khi hình bình hành thỏa mãn một trong hai điều kiện này, nó lập tức trở thành hình chữ nhật."
+                    },
+                    {
+                        question: "Chứng minh một Hình thoi là một Hình vuông cần chỉ ra thêm điều gì?",
+                        options: ["Có 2 đường chéo vuông góc.", "Có 1 góc vuông hoặc có 2 đường chéo bằng nhau.", "Có 2 cạnh kề bằng nhau.", "Có các cạnh đối song song."],
+                        correctAnswerIndex: 1,
+                        explanation: "Hình thoi có sẵn 4 cạnh bằng nhau và 2 đường chéo vuông góc. Nếu có thêm 1 góc vuông hoặc 2 đường chéo bằng nhau, nó sẽ trở thành hình vuông."
+                    }
+                ]
+            },
+            {
+                id: 3,
+                name: "Thác Nước Thales",
+                file: "dinh ly thales va duong trung binh.md",
+                theory: `
+                    <b>Định lý Thales (Thuận & Đảo):</b>
+                    Nếu <span class='math-expr'>MN // BC</span> thì:
+                    <div class="math-block">AM / AB = AN / AC &nbsp;và&nbsp; AM / MB = AN / NC</div>
+                    <b>Đường trung bình tam giác:</b>
+                    <ul>
+                      <li>Nối trung điểm hai cạnh của tam giác.</li>
+                      <li><b>Tính chất:</b> Song song với cạnh thứ ba và bằng một nửa cạnh ấy.</li>
+                      <li>Xét <span class='math-expr'>&Delta;ABC</span>, nếu D là trung điểm AB, E là trung điểm AC &rArr; <span class='math-expr'>DE // BC</span> và <span class='math-expr'>DE = BC / 2</span>.</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        question: "Xét <span class='math-expr'>&Delta;ABC</span> có <span class='math-expr'>MN // BC</span> (M thuộc AB, N thuộc AC). Hệ thức Thales nào dưới đây là đúng?",
+                        options: ["AM/MB = AN/NC", "AM/AB = NC/AN", "AM/MB = NC/AN", "MB/AB = AN/AC"],
+                        correctAnswerIndex: 0,
+                        explanation: "Theo định lý Thales, đường thẳng song song với một cạnh cắt hai cạnh còn lại sẽ định ra trên đó các đoạn thẳng tương ứng tỉ lệ. Do đó <span class='math-expr'>AM/MB = AN/NC</span>."
+                    },
+                    {
+                        question: "Tính chất đặc trưng của Đường trung bình trong tam giác là gì?",
+                        options: ["Vuông góc với cạnh thứ ba và bằng nửa cạnh đó.", "Song song với cạnh thứ ba và bằng nửa cạnh đó.", "Nối từ đỉnh tới trung điểm cạnh đáy.", "Song song và bằng độ dài cạnh đáy."],
+                        correctAnswerIndex: 1,
+                        explanation: "Đường trung bình tam giác là đoạn thẳng nối trung điểm 2 cạnh, song song với cạnh thứ 3 và bằng nửa cạnh ấy."
+                    },
+                    {
+                        question: "Cho tam giác ABC có độ dài cạnh đáy <span class='math-expr'>BC = 12 cm</span>. D và E là trung điểm của AB và AC. Hỏi độ dài đoạn DE bằng bao nhiêu?",
+                        options: ["24 cm", "8 cm", "6 cm", "4 cm"],
+                        correctAnswerIndex: 2,
+                        explanation: "Vì DE là đường trung bình của <span class='math-expr'>&Delta;ABC</span> nên <span class='math-expr'>DE = BC / 2 = 12 / 2 = 6 cm</span>."
+                    }
+                ]
+            },
+            {
+                id: 4,
+                name: "Đồi Nhân Tử",
+                file: "phan tich da thuc thanh nhan tu.md",
+                theory: `
+                    <b>Phân tích đa thức thành nhân tử:</b> Biến đổi một đa thức thành một tích của các đa thức.
+                    <b>4 Phương pháp cơ bản:</b>
+                    <ol>
+                      <li>Đặt nhân tử chung: <span class='math-expr'>AB + AC = A(B + C)</span></li>
+                      <li>Dùng hằng đẳng thức</li>
+                      <li>Nhóm hạng tử: Phối hợp ghép các cặp thích hợp để xuất hiện nhân tử chung.</li>
+                      <li>Phối hợp nhiều phương pháp</li>
+                    </ol>
+                    <i>⚠️ Lỗi dấu: Luôn đổi dấu bên trong khi đưa dấu trừ ra trước ngoặc nhóm: <span class='math-expr'>-x + y = -(x - y)</span>.</i>
+                `,
+                questions: [
+                    {
+                        question: "Phân tích đa thức <span class='math-expr'>3x<sup>2</sup> - 6x</span> thành nhân tử bằng cách đặt nhân tử chung ta thu được:",
+                        options: ["3(x<sup>2</sup> - 2x)", "3x(x - 2)", "3x(x + 2)", "x(3x - 6)"],
+                        correctAnswerIndex: 1,
+                        explanation: "Ta đặt nhân tử chung là <span class='math-expr'>3x</span> ra ngoài ngoặc: <span class='math-expr'>3x<sup>2</sup> - 6x = 3x(x - 2)</span>."
+                    },
+                    {
+                        question: "Phân tích đa thức <span class='math-expr'>xy + 3y + 2x + 6</span> thành nhân tử bằng phương pháp nhóm hạng tử thu được tích là:",
+                        options: ["(x + 3)(y + 2)", "(x - 3)(y + 2)", "(x + 3)(y - 2)", "(x - 3)(y - 2)"],
+                        correctAnswerIndex: 0,
+                        explanation: "Biến đổi:<br><span class='math-expr'>xy+3y + 2x+6 = y(x+3) + 2(x+3) = (x+3)(y+2)</span>."
+                    },
+                    {
+                        question: "Phép biến đổi nào dưới đây bị **SAI** do không thực hiện đổi dấu khi nhóm các hạng tử vào trong ngoặc có dấu trừ?",
+                        options: ["-x - y = -(x + y)", "-x + y = -(x - y)", "-x + y = -(x + y)", "x - y = -(-x + y)"],
+                        correctAnswerIndex: 2,
+                        explanation: "Khi nhóm hạng tử vào trong ngoặc có dấu trừ đằng trước, dấu của các hạng tử phải đổi: <span class='math-expr'>-x + y = -(x - y)</span>. Phép viết <span class='math-expr'>-x + y = -(x + y)</span> là sai vì vế phải bằng <span class='math-expr'>-x - y</span>."
+                    }
+                ]
+            },
+            {
+                id: 5,
+                name: "Đỉnh Pythagore",
+                file: "Định lý Pythagore.md",
+                theory: `
+                    Trong tam giác vuông, bình phương của cạnh huyền bằng tổng bình phương của hai cạnh góc vuông:
+                    <div class="math-block">a<sup>2</sup> + b<sup>2</sup> = c<sup>2</sup></div>
+                    Trong đó, c là độ dài cạnh huyền (cạnh đối diện góc vuông).
+                    <b>Các bộ ba số Pythagore kinh điển:</b>
+                    <ul>
+                      <li>3 - 4 - 5</li>
+                      <li>6 - 8 - 10</li>
+                      <li>5 - 12 - 13</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        question: "Trong tam giác vuông ABC vuông tại A. Hệ thức Pythagore đúng đại diện cho mối quan hệ các cạnh là:",
+                        options: ["AB<sup>2</sup> + BC<sup>2</sup> = AC<sup>2</sup>", "AB<sup>2</sup> + AC<sup>2</sup> = BC<sup>2</sup>", "AC<sup>2</sup> + BC<sup>2</sup> = AB<sup>2</sup>", "AB + AC = BC"],
+                        correctAnswerIndex: 1,
+                        explanation: "Cạnh đối diện góc vuông A là cạnh huyền BC. Hệ thức Pythagore: <span class='math-expr'>AB<sup>2</sup> + AC<sup>2</sup> = BC<sup>2</sup></span>."
+                    },
+                    {
+                        question: "Bộ ba độ dài nào dưới đây **KHÔNG PHẢI** là bộ ba số Pythagore của một tam giác vuông?",
+                        options: ["3 - 4 - 5", "6 - 8 - 10", "5 - 12 - 13", "4 - 5 - 6"],
+                        correctAnswerIndex: 3,
+                        explanation: "Thử tính bình phương: <span class='math-expr'>4<sup>2</sup> + 5<sup>2</sup> = 16 + 25 = 41 &ne; 6<sup>2</sup> (36)</span>. Do đó bộ 4 - 5 - 6 không lập thành tam giác vuông."
+                    },
+                    {
+                        question: "Cho tam giác ABC vuông tại A có hai cạnh góc vuông là <span class='math-expr'>AB = 6 cm</span> và <span class='math-expr'>AC = 8 cm</span>. Độ dài cạnh huyền BC là:",
+                        options: ["7 cm", "10 cm", "14 cm", "100 cm"],
+                        correctAnswerIndex: 1,
+                        explanation: "Áp dụng định lý Pythagore: <span class='math-expr'>BC<sup>2</sup> = AB<sup>2</sup> + AC<sup>2</sup> = 6<sup>2</sup> + 8<sup>2</sup> = 36 + 64 = 100</span>.<br>Suy ra <span class='math-expr'>BC = &radic;100 = 10 cm</span>."
+                    }
+                ]
+            }
+        ];
+
+        // --- GAME STATE ---
+        let playerClass = "knight";
+        let maxHp = 4;
+        let hp = 4;
+        let xp = 0;
+        let lvl = 1;
+        let shield = 0;
+        let comboStreak = 0;
+        
+        let currentStationIdx = 0;
+        let currentQuestionInStationIdx = 0; // 0, 1, 2
+        let selectedOptionIdx = null;
+        
+        let unlockedStations = [0]; // Array of station IDs unlocked
+        let failedQuestions = []; // Tracks failed questions for campfire: { questionObj, userSelection, correctSelection }
+
+        // --- DOM ELEMENTS ---
+        const lobbyScreen = document.getElementById("lobby-screen");
+        const arenaScreen = document.getElementById("arena-screen");
+        const campfireScreen = document.getElementById("campfire-screen");
+        const victoryScreen = document.getElementById("victory-screen");
+        const gameCardEl = document.getElementById("game-card-el");
+
+        const charCards = document.querySelectorAll(".char-card");
+        const startGameBtn = document.getElementById("start-game-btn");
+
+        const heartsContainerEl = document.getElementById("hearts-container-el");
+        const shieldIndicator = document.getElementById("shield-indicator");
+        const xpBarFillEl = document.getElementById("xp-bar-fill-el");
+        const xpTextEl = document.getElementById("xp-text-el");
+        const playerLevelDisplay = document.getElementById("player-level-display");
+        const playerAvatarMini = document.getElementById("player-avatar-mini");
+        
+        const arenaCampTitleEl = document.getElementById("arena-camp-title-el");
+        const questionTextEl = document.getElementById("question-text-el");
+        const arenaOptionsGridEl = document.getElementById("arena-options-grid-el");
+        
+        const combatFeedbackEl = document.getElementById("combat-feedback-el");
+        const feedbackHeaderEl = document.getElementById("feedback-header-el");
+        const explanationTextEl = document.getElementById("explanation-text-el");
+        
+        const quitArenaBtn = document.getElementById("quit-arena-btn");
+        const nextStageBtn = document.getElementById("next-stage-btn");
+        
+        const openBackpackBtn = document.getElementById("open-backpack-btn");
+        const closeBackpackBtn = document.getElementById("close-backpack-btn");
+        const inventoryModalEl = document.getElementById("inventory-modal-el");
+        const scrollsGridEl = document.getElementById("scrolls-grid-el");
+        const scrollViewerEl = document.getElementById("scroll-viewer-el");
+        const scrollViewerTitleEl = document.getElementById("scroll-viewer-title-el");
+        const scrollViewerContentEl = document.getElementById("scroll-viewer-content-el");
+        
+        const campfireReviewEl = document.getElementById("campfire-review-el");
+        const campfireRetryBtn = document.getElementById("campfire-retry-btn");
+        
+        const vicCharClass = document.getElementById("vic-char-class");
+        const vicLevel = document.getElementById("vic-level");
+        const vicCorrect = document.getElementById("vic-correct");
+        const victoryRestartBtn = document.getElementById("victory-restart-btn");
+
+        const soundToggle = document.getElementById("sound-toggle");
+        const themeToggle = document.getElementById("theme-toggle");
+
+        // --- CONTEXT ACTIONS ---
+        // Setup options selections
+        charCards.forEach(card => {
+            card.addEventListener("click", () => {
+                sounds.playClick();
+                charCards.forEach(c => c.classList.remove("selected"));
+                card.classList.add("selected");
+                playerClass = card.getAttribute("data-class");
+            });
+        });
+
+        // Toggle sound
+        const savedSound = localStorage.getItem("game-sound") || "enabled";
+        sounds.enabled = (savedSound === "enabled");
+        updateSoundIcon(sounds.enabled);
+        soundToggle.addEventListener("click", () => {
+            sounds.enabled = !sounds.enabled;
+            localStorage.setItem("game-sound", sounds.enabled ? "enabled" : "disabled");
+            updateSoundIcon(sounds.enabled);
+            sounds.playClick();
+        });
+
+        function updateSoundIcon(enabled) {
+            const icon = soundToggle.querySelector("i");
+            icon.className = enabled ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark";
+        }
+
+        // Toggle theme
+        const savedTheme = localStorage.getItem("game-theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        updateThemeIcon(savedTheme);
+        themeToggle.addEventListener("click", () => {
+            sounds.playClick();
+            const curr = document.documentElement.getAttribute("data-theme");
+            const next = curr === "dark" ? "light" : "dark";
+            document.documentElement.setAttribute("data-theme", next);
+            localStorage.setItem("game-theme", next);
+            updateThemeIcon(next);
+        });
+
+        function updateThemeIcon(theme) {
+            const icon = themeToggle.querySelector("i");
+            icon.className = theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+        }
+
+        // Start Game
+        startGameBtn.addEventListener("click", () => {
+            sounds.playClick();
+            initializeCharacter();
+            loadArenaQuestion();
+            switchView(arenaScreen);
+        });
+
+        function initializeCharacter() {
+            lvl = 1;
+            xp = 0;
+            comboStreak = 0;
+            currentStationIdx = 0;
+            currentQuestionInStationIdx = 0;
+            unlockedStations = [0];
+            failedQuestions = [];
+            
+            if (playerClass === "knight") {
+                maxHp = 4;
+                hp = 4;
+                shield = 0;
+                playerLevelDisplay.textContent = "Lv. 1 Hiệp Sĩ";
+                playerAvatarMini.querySelector("i").className = "fa-solid fa-shield-halved";
+            } else if (playerClass === "wizard") {
+                maxHp = 3;
+                hp = 3;
+                shield = 1;
+                playerLevelDisplay.textContent = "Lv. 1 Phù Thủy";
+                playerAvatarMini.querySelector("i").className = "fa-solid fa-wand-magic-sparkles";
+            } else {
+                maxHp = 3;
+                hp = 3;
+                shield = 0;
+                playerLevelDisplay.textContent = "Lv. 1 Thám Hiểm";
+                playerAvatarMini.querySelector("i").className = "fa-solid fa-compass";
+            }
+
+            renderHearts();
+            updateShieldDisplay();
+            updateXpDisplay();
+        }
+
+        function renderHearts() {
+            heartsContainerEl.innerHTML = "";
+            for (let i = 0; i < maxHp; i++) {
+                const heart = document.createElement("i");
+                if (i < hp) {
+                    heart.className = "fa-solid fa-heart"; // Full heart
+                } else {
+                    heart.className = "fa-regular fa-heart"; // Empty heart
+                }
+                heartsContainerEl.appendChild(heart);
+            }
+        }
+
+        function updateShieldDisplay() {
+            if (shield > 0) {
+                shieldIndicator.style.display = "inline-block";
+                shieldIndicator.innerHTML = `<i class="fa-solid fa-shield-cat"></i> Chắn ${shield}`;
+            } else {
+                shieldIndicator.style.display = "none";
+            }
+        }
+
+        function updateXpDisplay() {
+            const nextLvlXp = lvl * 100;
+            const xpPercent = Math.min((xp / nextLvlXp) * 100, 100);
+            xpBarFillEl.style.width = `${xpPercent}%`;
+            xpTextEl.textContent = `${xp}/${nextLvlXp}`;
+        }
+
+        // --- ARENA BATTLE ENGINE ---
+        function loadArenaQuestion() {
+            selectedOptionIdx = null;
+            nextStageBtn.disabled = true;
+            combatFeedbackEl.style.display = "none";
+
+            const station = GAME_STATIONS[currentStationIdx];
+            const q = station.questions[currentQuestionInStationIdx];
+
+            // Render Title
+            arenaCampTitleEl.innerHTML = `
+                <i class="fa-solid fa-campground" style="color:var(--amber-glow);"></i>
+                Trạm ${currentStationIdx + 1}: ${station.name} &mdash; Thử thách ${currentQuestionInStationIdx + 1}/3
+            `;
+
+            // Question
+            questionTextEl.innerHTML = q.question;
+
+            // Options
+            arenaOptionsGridEl.innerHTML = "";
+            const letters = ['A', 'B', 'C', 'D'];
+            q.options.forEach((optText, index) => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "opt-btn";
+                btn.id = `opt-choice-${index}`;
+                btn.innerHTML = `
+                    <span><span class="opt-letter">${letters[index]}.</span> ${optText}</span>
+                    <i class="fa-regular fa-circle" id="indicator-icon-${index}"></i>
+                `;
+                btn.addEventListener("click", () => handleAnswerSelected(index));
+                arenaOptionsGridEl.appendChild(btn);
+            });
+        }
+
+        function handleAnswerSelected(index) {
+            if (selectedOptionIdx !== null) return; // Answer is already submitted
+
+            sounds.playClick();
+            selectedOptionIdx = index;
+            
+            const btn = document.getElementById(`opt-choice-${index}`);
+            btn.classList.add("selected");
+            
+            gradeArenaQuestion(index);
+        }
+
+        function gradeArenaQuestion(selectedIdx) {
+            const station = GAME_STATIONS[currentStationIdx];
+            const q = station.questions[currentQuestionInStationIdx];
+            const isCorrect = (selectedIdx === q.correctAnswerIndex);
+            
+            const options = arenaOptionsGridEl.querySelectorAll(".opt-btn");
+            
+            options.forEach((btn, idx) => {
+                btn.disabled = true;
+                const icon = btn.querySelector("i");
+                if (idx === q.correctAnswerIndex) {
+                    btn.classList.add("correct");
+                    icon.className = "fa-solid fa-circle-check";
+                }
+                if (idx === selectedIdx && !isCorrect) {
+                    btn.classList.add("incorrect");
+                    icon.className = "fa-solid fa-circle-xmark";
+                }
+            });
+
+            // Feedback header & sound & stats change
+            if (isCorrect) {
+                sounds.playCorrect();
+                feedbackHeaderEl.className = "feedback-header correct";
+                feedbackHeaderEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>Chính xác! Cố gắng lắm.</span>`;
+                
+                comboStreak++;
+                
+                // Calculate XP
+                let gainedXp = 40; // Base XP
+                if (playerClass === "knight") {
+                    gainedXp = Math.round(gainedXp * 0.9); // Knight penalty
+                } else if (playerClass === "explorer") {
+                    // Double XP for combo streaks
+                    if (comboStreak >= 2) {
+                        gainedXp = gainedXp * 2;
+                        feedbackHeaderEl.innerHTML += ` <span style="font-size:0.75rem; background:var(--amethyst-cosmic); color:white; padding:1px 6px; border-radius:4px;">COMBO STREAK x2 XP!</span>`;
+                    }
+                }
+
+                xp += gainedXp;
+                checkLevelUp();
+            } else {
+                sounds.playIncorrect();
+                feedbackHeaderEl.className = "feedback-header incorrect";
+                feedbackHeaderEl.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> <span>Sai sót rồi! Mất HP.</span>`;
+                
+                comboStreak = 0; // reset combo
+
+                // Store in failed list
+                failedQuestions.push({
+                    stationName: station.name,
+                    questionText: q.question,
+                    selectedOption: q.options[selectedIdx] || "Không chọn",
+                    correctOption: q.options[q.correctAnswerIndex],
+                    explanation: q.explanation
+                });
+
+                // Deduct Shield / HP
+                if (shield > 0) {
+                    shield--;
+                    feedbackHeaderEl.innerHTML += ` <span style="font-size:0.75rem; background:var(--sapphire-magic); color:white; padding:1px 6px; border-radius:4px;">KHIÊN PHÉP ĐÃ ĐỠ!</span>`;
+                    updateShieldDisplay();
+                } else {
+                    hp--;
+                    renderHearts();
+                    
+                    if (hp <= 0) {
+                        // Game Over!
+                        setTimeout(triggerGameOver, 1500);
+                        return;
+                    }
+                }
+            }
+
+            // Reveal explanation
+            explanationTextEl.innerHTML = q.explanation;
+            combatFeedbackEl.className = `combat-feedback ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}`;
+            combatFeedbackEl.style.display = "block";
+            
+            nextStageBtn.disabled = false;
+        }
+
+        function checkLevelUp() {
+            const nextLvlXp = lvl * 100;
+            if (xp >= nextLvlXp) {
+                xp -= nextLvlXp;
+                lvl++;
+                sounds.playLevelUp();
+                
+                // Heal 1 HP on level up
+                if (hp < maxHp) {
+                    hp++;
+                    renderHearts();
+                }
+
+                // Show alert/message
+                alert(`CHÚC MỪNG! Bạn đã thăng lên Cấp ${lvl}! Máu đã được hồi phục +1 ❤️!`);
+            }
+            updateXpDisplay();
+            playerLevelDisplay.textContent = `Lv. ${lvl} ${playerClass === "knight" ? "Hiệp Sĩ" : playerClass === "wizard" ? "Phù Thủy" : "Thám Hiểm"}`;
+        }
+
+        nextStageBtn.addEventListener("click", () => {
+            sounds.playClick();
+            currentQuestionInStationIdx++;
+
+            // Check if cleared current camp
+            if (currentQuestionInStationIdx >= 3) {
+                currentQuestionInStationIdx = 0;
+                
+                // Unlock current station scroll reward
+                if (!unlockedStations.includes(currentStationIdx)) {
+                    unlockedStations.push(currentStationIdx);
+                }
+
+                currentStationIdx++;
+
+                // Check if victory (cleared all 6 stations)
+                if (currentStationIdx >= GAME_STATIONS.length) {
+                    triggerVictory();
+                    return;
+                } else {
+                    alert(`Chúc mừng! Bạn đã giải phóng thành công '${GAME_STATIONS[currentStationIdx - 1].name}'! Một bí kíp lý thuyết đã được gửi vào túi đồ của bạn.`);
+                    // Unlock next station scroll
+                    if (!unlockedStations.includes(currentStationIdx)) {
+                        unlockedStations.push(currentStationIdx);
+                    }
+                }
+            }
+
+            loadArenaQuestion();
+        });
+
+        quitArenaBtn.addEventListener("click", () => {
+            sounds.playClick();
+            if (confirm("Bạn có chắc chắn muốn bỏ dở cuộc phiêu lưu? Toàn bộ tiến độ leo núi sẽ bị xóa.")) {
+                switchView(lobbyScreen);
+            }
+        });
+
+        // --- BACKPACK INVENTORY MODAL ---
+        openBackpackBtn.addEventListener("click", () => {
+            sounds.playClick();
+            renderBackpackItems();
+            inventoryModalEl.classList.add("active");
+        });
+
+        closeBackpackBtn.addEventListener("click", () => {
+            sounds.playClick();
+            inventoryModalEl.classList.remove("active");
+        });
+
+        // Close backpack when clicking outside modal contents
+        window.addEventListener("click", (e) => {
+            if (e.target === inventoryModalEl) {
+                inventoryModalEl.classList.remove("active");
+            }
+        });
+
+        function renderBackpackItems() {
+            scrollsGridEl.innerHTML = "";
+            scrollViewerEl.style.display = "none";
+
+            GAME_STATIONS.forEach((station, idx) => {
+                const unlocked = unlockedStations.includes(idx);
+                
+                const item = document.createElement("div");
+                item.className = `scroll-item ${unlocked ? 'unlocked' : ''}`;
+                item.innerHTML = `
+                    <div class="scroll-icon">
+                        <i class="fa-solid ${unlocked ? 'fa-scroll' : 'fa-lock'}"></i>
+                    </div>
+                    <div>
+                        <div class="scroll-name">Bí kíp Trạm ${idx + 1}</div>
+                        <div class="scroll-status">${unlocked ? 'Đã mở khóa (Click xem)' : 'Khóa'}</div>
+                    </div>
+                `;
+
+                if (unlocked) {
+                    item.addEventListener("click", () => {
+                        sounds.playClick();
+                        scrollViewerTitleEl.textContent = `Bí Kíp Trạm ${idx + 1}: ${station.name}`;
+                        scrollViewerContentEl.innerHTML = station.theory;
+                        scrollViewerEl.style.display = "block";
+                    });
+                }
+
+                scrollsGridEl.appendChild(item);
+            });
+        }
+
+        // --- GAME OVER & CAMPFIRE ---
+        function triggerGameOver() {
+            // Fill review list in campfire screen
+            campfireReviewEl.innerHTML = "";
+            
+            if (failedQuestions.length === 0) {
+                campfireReviewEl.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem; text-align:center;">Bạn không làm sai câu nào cả! Hãy thử lại để đạt kết quả xuất sắc.</p>`;
+            } else {
+                failedQuestions.forEach((q, idx) => {
+                    const item = document.createElement("div");
+                    item.className = "campfire-review-item";
+                    item.innerHTML = `
+                        <div style="font-size:0.8rem; font-weight:700; color:var(--amber-glow); margin-bottom:2px;">
+                            Câu sai số ${idx + 1} (${q.stationName})
+                        </div>
+                        <div style="font-weight:600; font-size:0.92rem; margin-bottom:4px;">${q.questionText}</div>
+                        <div style="color:var(--ruby-heart); font-size:0.85rem; margin-bottom:4px;">
+                            Lựa chọn của bạn: ${q.selectedOption}
+                        </div>
+                        <div style="color:var(--emerald-forest); font-size:0.85rem; margin-bottom:4px; font-weight:600;">
+                            Đáp án đúng: ${q.correctOption}
+                        </div>
+                        <div style="background:rgba(255,255,255,0.03); padding:8px; border-radius:6px; font-size:0.85rem; margin-top:4px;">
+                            <b>Phương pháp giải:</b> ${q.explanation}
+                        </div>
+                    `;
+                    campfireReviewEl.appendChild(item);
+                });
+            }
+
+            switchView(campfireScreen);
+        }
+
+        campfireRetryBtn.addEventListener("click", () => {
+            sounds.playClick();
+            initializeCharacter();
+            loadArenaQuestion();
+            switchView(arenaScreen);
+        });
+
+        // --- VICTORY VIEW & CONFETTI ---
+        function triggerVictory() {
+            sounds.playFanfare();
+            
+            vicCharClass.textContent = playerClass === "knight" ? "Hiệp Sĩ Đại Số" : playerClass === "wizard" ? "Phù Thủy Hình Học" : "Nhà Thám Hiểm Toán Học";
+            vicLevel.textContent = `Level ${lvl}`;
+            vicCorrect.textContent = `${18 - failedQuestions.length} / 18 câu hỏi`;
+
+            startConfetti();
+            switchView(victoryScreen);
+            
+            // Stop confetti after 6 seconds
+            setTimeout(stopConfetti, 6000);
+        }
+
+        victoryRestartBtn.addEventListener("click", () => {
+            sounds.playClick();
+            switchView(lobbyScreen);
+        });
+
+        // --- CONFETTI ENGINE ---
+        const canvas = document.getElementById("confetti-canvas");
+        const ctx = canvas.getContext("2d");
+        let confettiActive = false;
+        let confettiPieces = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        class ConfettiPiece {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * -canvas.height - 20;
+                this.size = Math.random() * 8 + 6;
+                this.color = ['#f59e0b', '#ef4444', '#3b82f6', '#10b981', '#8b5cf6'][Math.floor(Math.random() * 5)];
+                this.speedY = Math.random() * 3 + 2;
+                this.speedX = Math.random() * 2 - 1;
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 4 - 2;
+            }
+
+            update() {
+                this.y += this.speedY;
+                this.x += this.speedX;
+                this.rotation += this.rotationSpeed;
+                
+                if (this.y > canvas.height) {
+                    this.y = -20;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+                ctx.restore();
+            }
+        }
+
+        function startConfetti() {
+            resizeCanvas();
+            confettiActive = true;
+            canvas.style.display = "block";
+            confettiPieces = [];
+            for (let i = 0; i < 150; i++) {
+                confettiPieces.push(new ConfettiPiece());
+            }
+            animateConfetti();
+        }
+
+        function stopConfetti() {
+            confettiActive = false;
+            canvas.style.display = "none";
+        }
+
+        function animateConfetti() {
+            if (!confettiActive) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            confettiPieces.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            requestAnimationFrame(animateConfetti);
+        }
+
+        // --- UTILS ---
+        function switchView(target) {
+            document.querySelectorAll(".game-screen").forEach(s => s.style.display = "none");
+            target.style.display = "flex";
+            
+            // Auto scroll container
+            gameCardEl.scrollTop = 0;
+        }
+
+    </script>
+</body>
+</html>
